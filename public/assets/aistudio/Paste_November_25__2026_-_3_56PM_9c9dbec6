@@ -1,0 +1,445 @@
+# MASTER DEVELOPMENT PROMPT: CAMPUS THRIFT
+## Senior Full-Stack Engineer | Existing Product Extension | Three-Phase Implementation
+
+You are a Senior Full-Stack Engineer, Product Architect and UI/UX Engineer
+taking ownership of an existing application. The product name is
+**Campus Thrift**. Use this name in the page title, logo, README and all UI
+copy (replace any mention of ReLoop or GREEN).
+
+Your job is to extend the existing, working application into a complete,
+student-focused, circular campus marketplace. This is NOT a greenfield
+project. Understand the existing codebase, preserve working functionality, and
+implement the remaining features without unnecessary rewrites.
+
+I will provide: (1) the existing project ZIP/repository, (2) this
+specification, (3) five UI reference images (attached in order, ref 1 to
+ref 5). All data in the app is FAKE: no real names, emails or numbers.
+
+======================================================================
+SECTION 1: EXISTING IMPLEMENTATION (DO NOT REBUILD)
+======================================================================
+Stack (keep it): HTML5, CSS3, Vanilla JavaScript (ES6+), Fetch API, Chart.js,
+Lucide Icons; Node.js + Express.js (REST, MVC); MySQL 8.0 with
+mysql2/promise and connection pooling.
+
+Already implemented (verify, do not assume):
+1. Listing creation and CRUD.
+2. Listing search and filtering.
+3. Historical dataset of exactly 200 synthetic transactions, with duplicate
+   prevention on seeding.
+4. Data-driven pricing engine: similarity-weighted by category, condition
+   and age; returns suggested price, min/max range, depreciation %,
+   comparable-transaction count and a plain-English explanation.
+5. Pricing analytics and 4 Chart.js charts.
+6. Basic wanted board (create and display).
+7. Frontend/backend integration, existing schema, README and PROMPT_LOG.md.
+8. The judge demo: Scientific Calculator, category Calculators, Good, 24
+   months, original price Rs 1,200 returns a suggested price (about Rs 710)
+   with a range and explanation, and the "Load Benchmark" button on the Sell page.
+
+Rules for the pricing engine:
+- Do NOT replace it with hardcoded prices, arbitrary percentages or an
+  unrelated AI model. Preserve pricing service and extend its integration
+  only where necessary.
+- Do NOT remove or modify the original judge demonstration scenario.
+
+Before modifying anything:
+- Inspect the whole project structure, README, PROMPT_LOG.md, the database
+  schema, and every controller, route and service.
+- Understand the existing API contracts.
+- Run the application and verify which features actually work. Do not treat
+  the project description as proof that everything works.
+- Identify missing functionality and technical limitations.
+- Do not introduce another framework or database. Do not migrate to React,
+  Next.js or anything else. If a change is truly necessary, explain it first.
+- Known risks to check and report: the app needs a running MySQL (if MySQL is
+  a problem on the demo machine, propose the smallest safe fix and ask first);
+  backend/.env must never be committed or shown; the existing app has no real
+  authentication (see Section 9).
+
+======================================================================
+SECTION 2: PRODUCT VISION
+======================================================================
+Campus Thrift is a campus-specific circular marketplace where students can
+buy, sell, swap, borrow and rent items, post things they need, and discover
+relevant products through personalised recommendations.
+
+Philosophy: "Don't buy new when someone on your campus already has what you need."
+
+It must feel designed for college students, not like generic e-commerce:
+friendly, playful without being childish, visually distinctive, easy to
+navigate, privacy-conscious, practical and reliable. Avoid unnecessary
+complexity.
+
+======================================================================
+SECTION 3: DESIGN REQUIREMENTS (PLAYFUL NEO-BRUTALISM)
+======================================================================
+The 5 reference images are STYLE references, not page layouts to copy:
+- ref 1: Neo-Brutalism component library (bold borders, hard shadows, vibrant
+  colours, tabs, toggles, progress bars, menus, success toast, avatars).
+- ref 2: landing page: coloured pill tags row, three outlined pastel cards,
+  circular framed hero image.
+- ref 3: landing page: arch-framed hero photos, dark logo strip, three
+  pastel feature cards, big yellow "Why us?" band with stats.
+- ref 4: boxed dashboard with numbered sections and a yellow header.
+- ref 5: comic-panel page with starburst badges, a ticker strip, plan cards,
+  a "latest activity" ledger and numbered steps.
+Study them before coding. If you cannot view the images, follow the written
+specification below exactly.
+
+VISUAL LANGUAGE
+- Page background: warm cream (#FBF3E4). No pure white pages, no dark mode.
+- Every card, button, input, tab, badge and modal has a thick solid black
+  border (2.5-3px, #111) and a HARD offset shadow (4px 4px 0 #111) with NO
+  blur. Hover: shift (-2px,-2px) and enlarge the shadow. Press: shift
+  (+2px,+2px) and shrink the shadow.
+- Flat fills only: yellow #FFC93C, coral #F25F5C, purple #9B7BEA, teal #3CC4B3,
+  pink #F7A8C4, sky #4C9BE8, peach #F9C9B0, mint #BFE8C9, ink #111111.
+  No gradients, no glassmorphism, no soft shadows.
+- Corner radius mostly 10-14px. A big feature band may have one large rounded
+  corner (about 40px). Pills only for category tags, status chips and filters.
+  Not everything should be a pill.
+- Typography: headings in "Space Grotesk" or "Poppins" 700-800, large and
+  tight; body in "Inter"; small labels in "Space Mono" uppercase; optional
+  comic titles in "Bowlby One" or "Anton". Always include system-ui fallbacks
+  in case Google Fonts fail offline.
+- Section headings highlight one word with a coloured box behind it.
+- Sparse accents only: tiny stars, diamonds, squares, starburst badges
+  ("-40%", "NEW"), halftone dots in one or two panels.
+- Rhythm: full-width coloured bands (yellow, teal, peach) alternating with
+  cream, plus a dark ink ticker strip with scrolling text
+  ("BUY * SWAP * BORROW * RENT * WANTED *").
+- Transaction type colours everywhere: SELL yellow, SWAP purple, BORROW teal,
+  RENT coral. Condition tags: Excellent mint, Good sky, Fair yellow, Poor peach.
+
+PAGE MAPPING (keep all existing pages and functionality)
+1. Home / Marketplace: hero in the style of refs 2 and 3 (bold headline
+   "Don't buy new. Your campus already has it.", two buttons, a framed
+   mascot illustration); row of coloured category pills that act as filters
+   (active one black); three outlined pastel feature cards ("Fair price",
+   "Swap & Rent", "Campus verified"); listing grid with bordered cards
+   (image, type chip, price, condition tag, pseudonymous seller identity, Little
+   Loops line); a yellow stats band (e.g. "200 sales analysed", "avg % value
+   retained", "items reused") like ref 3; the ticker strip.
+2. Listing detail: numbered boxed sections like ref 4: 1 Item, 2 Price & why
+   (the existing "Why this price?" panel), 3 Seller, 4 Request/Offer, plus the
+   Little Loops speech bubble.
+3. Sell / Create listing: numbered boxes as in ref 4: 1 About the item,
+   2 Choose how (four large selectable tiles SELL/SWAP/BORROW/RENT like the
+   plan cards in ref 5), 3 Price and details. Suggested-price card with a
+   starburst badge and a range bar (ref 1 progress bars). Keep "Load Benchmark".
+4. Pricing Insights: comic-panel layout (ref 5). Each Chart.js chart sits in
+   a bordered panel with a coloured header tag and a one-line takeaway.
+   Charts use the same palette, thick outlines, no gradients.
+5. Wanted board: ledger-style rows (ref 5) with emoji avatar, item, budget
+   badge and urgency tag; "Post a request" opens a bordered modal.
+6. Events strip: dismissible coloured banner (rounded-corner panel like ref 1)
+   with event name, days left and three item chips.
+7. Navigation: top bar with a bordered logo block (star icon, ref 1), tabs
+   with the active tab yellow, and a black "Sell an item" button. Mobile:
+   fixed bottom tab bar with the same borders.
+8. Forms and controls (toggles, checkboxes, dropdowns, search, toasts) follow
+   ref 1: teal success, coral error.
+9. Empty, loading and error states: a small bordered card with a mascot and
+   a button; never a blank screen.
+
+DESIGN RULES
+- Build ONE shared stylesheet with CSS variables (colours, border width,
+  shadow, radii, spacing scale) and reusable classes (.card, .btn, .chip, .tag,
+  .panel, .band, .ticker). Reuse everywhere; do not restyle page by page.
+- Do not independently redesign layouts you think are "more modern". Keep
+  the box-based sectioning, hierarchy and proportions of the references.
+- Accessibility: strong contrast, visible focus outlines, touch targets at
+  least 44px, responsive layouts, respect prefers-reduced-motion.
+- Motion: only hover/press shifts, a short ticker scroll and a small
+  confetti or star burst on publish.
+- Avoid: gradients, blurred shadows, glass effects, random floating
+  decorations, stock-photo hero banners, oversized empty heroes, generic SaaS
+  dashboards, repetitive marketing copy.
+- Before coding, report your design tokens, page mapping and anything in the
+  references you could not interpret.
+
+======================================================================
+SECTION 4: UNIFIED LISTING SYSTEM
+======================================================================
+Extend the existing listing system with four transaction types: SELL, SWAP,
+BORROW, RENT. Use ONE unified listing model with a transaction_type field and
+type-specific attributes. Do not create four separate systems.
+
+Common fields: listing ID, seller ID, item name, category, description,
+images, original purchase price, item age, condition, suggested fair price,
+asking price, transaction type, availability status, creation date.
+
+SELL: suggested fair price (from the existing engine), asking price, optional
+PRIVATE minimum acceptable price, "willing to negotiate" flag. The private
+minimum must NEVER appear in any public API response, listing JSON, frontend
+HTML or buyer-facing screen. Buyers can request at the asking price, submit
+an offer, and see whether negotiation is accepted. Sellers can accept, reject
+or counteroffer. No competitive bidding in this phase.
+
+SWAP: the item offered; categories/items the seller would accept; whether
+multiple swap options are accepted. A buyer proposes a swap by choosing one of
+their own listings or describing an exchange. A swap is valid only after both
+parties accept.
+
+BORROW (free lending): availability; min/max duration; collection location;
+special conditions; optional refundable deposit. The borrower gives start
+date, expected return date and an optional message; the owner accepts or
+rejects. After acceptance the item is reserved for the agreed period. Track:
+request, approval, collection confirmation, active borrowing, return
+confirmation, completion.
+
+RENT (separate from borrowing): rental price per day or agreed duration;
+availability; min/max period; optional refundable deposit; collection location;
+conditions. The renter selects dates and submits a request; the owner accepts
+or rejects. Track: request, approval, reservation, collection, active rental,
+return, completion.
+
+No payment gateway. Payment and item inspection happen in person between
+students. The app manages only requests, agreements, availability and confirmations.
+
+======================================================================
+SECTION 5: PRICING AND NEGOTIATION
+======================================================================
+Preserve the existing pricing engine. For SELL listings keep three separate
+concepts: suggested fair price (engine), asking price (seller), minimum
+acceptable price (optional, private). Example: suggested Rs 3,000, asking
+Rs 3,200, private minimum Rs 2,700; a buyer offers Rs 2,900; the seller
+accepts, rejects or counters. Never reveal the minimum to buyers. Never
+auto-accept an offer just because it exceeds the private minimum. The suggested
+price is guidance, not mandatory. RENT uses rental pricing (not the resale
+price), BORROW can be free, SWAP does not force a monetary price.
+
+======================================================================
+SECTION 6: TRANSACTION LIFECYCLES
+======================================================================
+Never mark an item sold, swapped, borrowed or returned just because a button is
+clicked.
+SELL: AVAILABLE > REQUESTED > ACCEPTED > RESERVED > MEETING ARRANGED >
+  HANDOVER CONFIRMED > COMPLETED. Alternatives: REJECTED, CANCELLED, EXPIRED,
+  DISPUTED.
+SWAP: AVAILABLE > SWAP PROPOSED > COUNTERPROPOSED (optional) > MUTUALLY
+  ACCEPTED > HANDOVER > BOTH PARTIES CONFIRM > COMPLETED.
+BORROW: AVAILABLE > BORROW REQUESTED > APPROVED > RESERVED > COLLECTED >
+  ACTIVE > RETURN INITIATED > BOTH PARTIES CONFIRM RETURN > COMPLETED.
+RENT: AVAILABLE > RENTAL REQUESTED > APPROVED > RESERVED > COLLECTED >
+  RENTAL ACTIVE > RETURN INITIATED > BOTH PARTIES CONFIRM RETURN > COMPLETED.
+
+Rules: one active reservation per item for any overlapping period; prevent
+double booking; no requests for unavailable items; validate rental and
+borrowing dates; both parties see a clear status; cancellation under defined
+conditions; record timestamps and WHO performed each confirmation; all state
+transitions are server-side and validated; use database transactions where
+several updates must succeed together.
+
+Reservation expiry: when a seller accepts one of several interested buyers,
+reserve the item temporarily, notify that buyer and give a confirmation
+deadline. If it expires, release the item and notify the seller and eligible
+waiting buyers. Never auto-select the next buyer without the seller's
+consent. For borrowing and renting, expiry must respect availability dates and
+overlapping reservations.
+
+======================================================================
+SECTION 7: WANTED BOARD AND MATCHING
+======================================================================
+Extend the existing wanted board. A request has: item name, category,
+description, max budget, desired condition, required-by date, preference
+(BUY / BORROW / RENT / SWAP), optional duration for borrow/rent, and a status
+(OPEN, PARTIALLY FULFILLED, FULFILLED, CLOSED, EXPIRED). Support an
+"urgent" flag.
+
+Rule-based matching service: when a request is created, search existing
+available listings by category and item name, condition, budget or rental
+constraints and availability, and return matches. When a listing is created,
+find matching open requests, notify those students and show the matches to the
+seller. Do not auto-close a request when one seller responds; the student
+reviews alternatives and closes it manually. Use a simple, explainable
+matching score (relevance, budget, condition, availability). No machine learning.
+
+======================================================================
+SECTION 8: PERSONALISATION AND CAMPUS EVENTS
+======================================================================
+Optional preferences: favourite categories, price range, preferred
+transaction types, saved items, posted needs. Recommendations use explicit
+interests, wanted requests, budget compatibility, upcoming events,
+availability and listing relevance. EVERY recommendation shows a short reason,
+for example "Matches your calculator request", "Useful for your upcoming
+placement drive", "Available within your budget".
+
+Campus events: a small configured dataset (name, date, description, relevant
+categories, optional image), for example placement drives, Dandiya night,
+college fest, hackathon, farewell, semester exams. When an event is near, show a
+contextual banner and relevant items (e.g. "Dandiya night is coming! Explore
+pre-loved outfits and accessories from your campus."; placement drive: formal
+shirts, trousers, blazers, shoes; exams: calculators, books, drafters).
+Suggestions must be dismissible, never spammy, and events must exist in the
+configured data. Label all event data as demo data.
+
+======================================================================
+SECTION 9: ANONYMOUS IDENTITY, VERIFICATION AND TRUST
+======================================================================
+Public profiles are pseudonymous: random username plus emoji avatar (for
+example Panda_27 🐼, Mochi_14 🍡, Pixel_Fox 🦊). Users can change the avatar or
+pick another available identity. Never expose real names, personal emails or
+private account data publicly; keep an internal account identity for
+authentication, transaction records and verification.
+
+The existing app has no real authentication. Add lightweight demo
+authentication (server-issued session/token). Every user-specific action must use
+the SERVER-SIDE identity, never frontend-supplied user IDs. Clearly label demo
+accounts as demo.
+
+Verification: a campus verification mechanism (for example college-email
+domain check with a simulated OTP, clearly labelled demo). A verified badge is
+awarded only when that process succeeds. Do not auto-verify everyone.
+
+Ratings: only after a COMPLETED transaction; buyer and seller can rate each
+other (overall rating, optional short feedback, transaction reference);
+prevent duplicates, ratings of incomplete transactions and self-rating.
+
+Trust indicators: verification status, completed transactions, average
+rating, successful swaps, rental/borrow history. Never show fabricated stats as
+real achievements; label synthetic demo users.
+
+======================================================================
+SECTION 10: LITTLE LOOPS (ITEM PERSONALITY)
+======================================================================
+Each listing can have a small first-person mascot line. Deterministic, built
+from predefined templates by category, age, condition and transaction type. No
+external LLM API. Examples:
+- Bicycle: "Hi! I'm a bicycle. I've been around for two years, but I've
+  still got plenty of rides left in me!"
+- Books: "Hey! I've survived three semesters. Ready to help you survive yours?"
+- Scientific calculator: "Psst! Exams are coming. I'm ready for those equations."
+- Rented item: "I'm only visiting your desk for a week!"
+Consistent visual identity with a category-specific illustration or emoji
+avatar. Short and natural, not repetitive or over-enthusiastic. It must
+enhance the listing, not interfere with usability.
+
+======================================================================
+SECTION 11: THREE-PHASE PLAN (EXACTLY THREE PHASES)
+======================================================================
+Complete and test each phase before starting the next. Stop after each
+phase and report.
+
+PHASE 1: FOUNDATION, REDESIGN, LISTING TYPES
+1. Audit the repository. 2. Study the UI references. 3. Build the shared
+design system. 4. Redesign existing pages per Section 3. 5. Preserve pricing
+and analytics. 6. Pseudonymous identities, emoji avatars and demo auth.
+7. SELL/SWAP/BORROW/RENT listing creation. 8. Type-specific fields and
+validation. 9. Asking price and private minimum price. 10. Availability and
+duration fields. 11. Little Loops. 12. Update listing detail and marketplace
+filters (including a transaction-type filter). 13. Safe schema migration.
+14. Backward compatibility with existing records.
+ACCEPTANCE TESTS: the existing pricing benchmark still works; the 200-row
+dataset is intact; existing search works; new SELL, SWAP, BORROW and RENT
+listings can be created; the private minimum is never exposed publicly (check
+the raw API JSON); mascots show appropriate content; existing analytics
+work; the responsive UI matches the references.
+After Phase 1, stop and provide a report. Do not start Phase 2 until instructed.
+
+PHASE 2: TRANSACTIONS, WANTED MATCHING, PERSONALISATION
+1. Purchase requests. 2. Offer, accept, reject, counteroffer. 3. Swap
+proposals and mutual acceptance. 4. Borrow requests and approvals. 5. Rental
+requests and approvals. 6. Reservations and expiry. 7. Collection and return
+confirmations. 8. Transaction history. 9. Post-completion ratings.
+10. Campus verification and trust badges. 11. Extended wanted matching.
+12. Matching notifications. 13. Student preferences. 14. Campus events and
+contextual recommendations. 15. Personalised discovery sections.
+ACCEPTANCE TESTS: purchase lifecycle works; negotiation never exposes the
+private minimum; swap requires mutual acceptance; borrowing supports free
+lending and a return date; renting supports charges and date validation;
+overlapping reservations are blocked; both parties confirm handover/return;
+a completed transaction cannot be rated twice; wanted requests match existing
+listings and new listings match existing requests; event recommendations are
+relevant and dismissible; recommendations respect budget and availability.
+After Phase 2, stop and provide a report. Do not start Phase 3 until instructed.
+
+PHASE 3: BIDDING, POLISH, HARDENING
+Bidding only for explicitly selected high-value SELL listings (never for
+ordinary listings, swaps, borrowing or renting); the seller can enable or
+disable it. Flow: seller enables bidding; buyers bid; validate amount and
+deadline; show the current highest eligible bid; the seller reviews and
+accepts a bid; the chosen buyer gets a response deadline; if they do not
+respond the selection expires; the next eligible bidder is offered the item
+only with seller approval; once confirmed, continue through the standard
+lifecycle. Never complete a transaction automatically from the highest bid.
+Bidding must not interfere with normal negotiation.
+Then: full UI consistency review, mobile testing, database consistency tests,
+authentication and authorisation tests, input validation tests, concurrent
+reservation tests, regression tests, better empty and error states, and
+documentation updates.
+
+======================================================================
+SECTION 12: ENGINEERING REQUIREMENTS
+======================================================================
+Follow the existing MVC architecture; keep routes, controllers, services,
+database access, frontend API client and UI rendering separate. Use
+parameterised SQL everywhere. Validate all input on the backend. Never trust
+frontend-supplied user IDs, prices, statuses or permissions. Add constraints
+and indexes. Use transactions for multi-step operations and handle concurrent
+requests safely. Prevent: duplicate reservations, unauthorised listing edits,
+private price leakage, invalid state transitions, double completion, duplicate
+ratings, invalid rental dates, negative prices or quantities. Use a consistent
+API response format with meaningful HTTP status codes. Never silently swallow
+exceptions. Keep secrets in environment variables and never expose .env
+contents in frontend code or docs. Avoid unnecessary dependencies. Do not use
+an external AI service; recommendations and mascots must work without one.
+
+======================================================================
+SECTION 13: AI ENGINEERING AND PROMPT LOG
+======================================================================
+For each major component: understand the requirement, explain the proposed
+implementation, generate code in manageable units, inspect the output, find
+real bugs and wrong assumptions, fix them, and test the fix. Maintain
+PROMPT_LOG.md with the prompt used, what the AI generated, ACTUAL mistakes
+found, how each was found, what changed and how the fix was tested. Do not
+invent mistakes. A human team member must be able to explain every important
+business rule and technical decision.
+
+======================================================================
+SECTION 14: MANDATORY SAFETY RULES
+======================================================================
+1. Never overwrite the entire project. 2. Never delete working features.
+3. Never replace the pricing algorithm with hardcoded logic. 4. Never change
+the schema without considering existing records. 5. Never duplicate tables or
+endpoints without checking existing ones. 6. Never rely on frontend-only
+business rules where the backend must enforce them. 7. Never expose private
+seller information. 8. Never fake a success response. 9. Never leave buttons
+that look functional but do nothing. 10. Never use hardcoded listing data for
+core workflows. 11. Document any half-implemented feature. 12. Do not start the
+next phase before the current one passes its tests. 13. Do not alter the judge
+scenario. 14. Do not change the stack unnecessarily. 15. Preserve existing
+user data and historical transactions.
+Before changing a file, understand its responsibility and dependencies. Make
+small controlled modifications. If a feature conflicts with the architecture,
+explain the conflict and propose the smallest safe change.
+
+======================================================================
+SECTION 15: REQUIRED OUTPUT AFTER EACH PHASE
+======================================================================
+1. Summary of features. 2. Files created. 3. Files modified. 4. Schema
+changes. 5. New or modified API endpoints. 6. Tests executed. 7. Test
+results (report failures honestly). 8. Known limitations. 9. Unresolved
+issues. 10. How to run and verify. Update README.md and PROMPT_LOG.md. Do not
+claim a feature is complete unless it is implemented and tested.
+
+======================================================================
+FINAL EXPECTATION
+======================================================================
+Campus Thrift should feel like a genuine campus community marketplace:
+students can discover, buy, sell, swap, borrow and rent without complicated
+workflows; sellers control pricing, availability and transactions; buyers get
+clear information, fair-price guidance and reliable request tracking; wanted
+requests connect students with relevant listings; personalisation fits campus
+life; Little Loops give items a friendly personality; and the whole app is
+technically sound, responsive and visually consistent with the neo-brutalist
+references. The goal is not the maximum number of features but a coherent,
+functional and delightful product.
+
+START WITH THE REPOSITORY AUDIT AND PHASE 1 ONLY.
+Do not implement Phase 2 or Phase 3 until explicitly instructed.
+Before modifying any files, report your understanding of the existing
+architecture, the UI references and your Phase 1 implementation plan. Then
+proceed with Phase 1 once you confirm there are no critical conflicts with the
+existing codebase.

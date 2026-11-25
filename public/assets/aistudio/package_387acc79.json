@@ -1,0 +1,20 @@
+{
+  "name": "reloop-campus-marketplace",
+  "version": "1.0.0",
+  "description": "ReLoop - The Smart Campus Resale Marketplace with Data-Driven Pricing Engine",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "install:backend": "cd backend && npm install",
+    "seed": "node backend/database/seed.js"
+  },
+  "keywords": [
+    "campus",
+    "marketplace",
+    "pricing-engine",
+    "mysql",
+    "express"
+  ],
+  "author": "ReLoop Team",
+  "license": "ISC"
+}

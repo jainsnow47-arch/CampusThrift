@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReLoop – Your Campus, Your Needs, Your Way</title>
+  <meta name="description" content="ReLoop: A personalised campus circular marketplace with explainable fair pricing from 200+ historical student sales.">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Space Mono (with system fallbacks) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Neo-Brutalist Design System -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- =========================================================================
+       Navigation Bar (Ref 1 Segmented Tabs + Ref 2 Layout)
+       ========================================================================= -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand-logo" data-view-target="marketplace">
+        <div class="logo-badge">
+          <i data-lucide="sparkles" style="width:20px;height:20px;"></i>
+        </div>
+        <span class="brand-name">ReLoop</span>
+      </a>
+
+      <nav aria-label="Main navigation">
+        <ul class="nav-tabs-group">
+          <li>
+            <button class="nav-btn active" data-view-target="marketplace">
+              <i data-lucide="store" style="width:15px;height:15px;"></i>
+              <span>Marketplace</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view-target="sell">
+              <i data-lucide="plus-circle" style="width:15px;height:15px;"></i>
+              <span>Sell</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view-target="insights">
+              <i data-lucide="bar-chart-3" style="width:15px;height:15px;"></i>
+              <span>Insights</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view-target="wanted">
+              <i data-lucide="bookmark" style="width:15px;height:15px;"></i>
+              <span>Wanted</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-secondary btn-sm" onclick="App.openModal('wantedModal')">
+          Request Item
+        </button>
+        <button class="btn btn-primary btn-sm" data-view-target="sell">
+          Sell an Item
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dark Ink Ticker Strip (Ref 5) -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span>BUY <em class="ticker-dot">★</em> FAIR PRICE <em class="ticker-dot">★</em> CAMPUS PICKUP <em class="ticker-dot">★</em> WANTED BOARD <em class="ticker-dot">★</em> ZERO FEES <em class="ticker-dot">★</em> 200+ REAL SALES</span>
+      <span>BUY <em class="ticker-dot">★</em> FAIR PRICE <em class="ticker-dot">★</em> CAMPUS PICKUP <em class="ticker-dot">★</em> WANTED BOARD <em class="ticker-dot">★</em> ZERO FEES <em class="ticker-dot">★</em> 200+ REAL SALES</span>
+      <span>BUY <em class="ticker-dot">★</em> FAIR PRICE <em class="ticker-dot">★</em> CAMPUS PICKUP <em class="ticker-dot">★</em> WANTED BOARD <em class="ticker-dot">★</em> ZERO FEES <em class="ticker-dot">★</em> 200+ REAL SALES</span>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       VIEW 1: MARKETPLACE
+       ========================================================================= -->
+  <main id="marketplace-view" class="app-view">
+    <!-- Hero Section (Ref 2) -->
+    <section class="hero-section">
+      <div class="container hero-grid">
+        <div>
+          <div class="hero-kicker">
+            <i data-lucide="repeat" style="width:14px;height:14px;"></i>
+            Your Campus, Your Needs, Your Way
+          </div>
+          <h1 class="hero-headline">
+            Don't buy new. Your campus already has it.
+          </h1>
+          <p class="hero-subtitle">
+            ReLoop connects graduating seniors and incoming juniors with explainable, data-driven fair prices backed by 200 historical campus transactions.
+          </p>
+          <div class="hero-cta-row">
+            <button class="btn btn-primary btn-lg" onclick="document.getElementById('marketplaceCatalog').scrollIntoView({behavior:'smooth'})">
+              Discover Deals
+            </button>
+            <button class="hero-play-btn" data-view-target="sell">
+              <span class="hero-play-circle">
+                <i data-lucide="play" style="width:15px;height:15px; fill:#111111;"></i>
+              </span>
+              <span>Check Fair Price</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Circular Sky-Framed Campus Mascot Illustration (Ref 2) -->
+        <div class="hero-visual">
+          <div class="hero-circle-frame">
+            <div class="hero-speech-bubble">
+              Fair price, zero guesswork! 🧮
+            </div>
+            <!-- Handcrafted Neo-Brutalist Campus Buddy SVG -->
+            <svg viewBox="0 0 240 240" width="245" height="245" aria-label="ReLoop Campus Mascot">
+              <!-- Backpack body -->
+              <rect x="64" y="68" width="112" height="122" rx="28" fill="#FFC93C" stroke="#111111" stroke-width="5"/>
+              <rect x="78" y="118" width="84" height="54" rx="14" fill="#F25F5C" stroke="#111111" stroke-width="4.5"/>
+              <!-- Handle -->
+              <path d="M96 68 C96 46, 144 46, 144 68" fill="none" stroke="#111111" stroke-width="5" stroke-linecap="round"/>
+              <!-- Friendly eyes -->
+              <circle cx="96" cy="94" r="9" fill="#111111"/>
+              <circle cx="144" cy="94" r="9" fill="#111111"/>
+              <circle cx="93" cy="91" r="3" fill="#FFFFFF"/>
+              <circle cx="141" cy="91" r="3" fill="#FFFFFF"/>
+              <!-- Smile -->
+              <path d="M108 104 Q120 115 132 104" fill="none" stroke="#111111" stroke-width="4.5" stroke-linecap="round"/>
+              <!-- Little calculator peeking out of pocket -->
+              <rect x="132" y="126" width="38" height="48" rx="6" fill="#3CC4B3" stroke="#111111" stroke-width="3.5" transform="rotate(8 150 150)"/>
+              <rect x="139" y="132" width="24" height="12" rx="2" fill="#FFFDF8" stroke="#111111" stroke-width="2.5" transform="rotate(8 150 150)"/>
+              <!-- Book peeking left -->
+              <rect x="68" y="130" width="34" height="44" rx="5" fill="#9B7BEA" stroke="#111111" stroke-width="3.5" transform="rotate(-8 85 150)"/>
+              <!-- Stars -->
+              <path d="M40 72 L44 82 L54 86 L44 90 L40 100 L36 90 L26 86 L36 82 Z" fill="#FFC93C" stroke="#111111" stroke-width="2.5"/>
+              <path d="M198 152 L201 160 L209 163 L201 166 L198 174 L195 166 L187 163 L195 160 Z" fill="#BFE8C9" stroke="#111111" stroke-width="2.5"/>
+            </svg>
+            <div class="hero-stamp-badge">
+              <strong>200</strong>
+              <span>SALES<br>ANALYZED</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Multicolor Category Pills (Ref 2) -->
+    <section class="category-pills-band">
+      <div class="container">
+        <div class="category-pills-row">
+          <button class="cat-pill active" data-category="All" data-tone="yellow">All Items</button>
+          <button class="cat-pill" data-category="Calculators" data-tone="teal">Calculators</button>
+          <button class="cat-pill" data-category="Books" data-tone="mint">Books</button>
+          <button class="cat-pill" data-category="Cycles" data-tone="sky">Cycles</button>
+          <button class="cat-pill" data-category="Electronics" data-tone="purple">Electronics</button>
+          <button class="cat-pill" data-category="Furniture" data-tone="peach">Furniture</button>
+          <button class="cat-pill" data-category="Lab Equipment" data-tone="pink">Lab Equipment</button>
+          <button class="cat-pill" data-category="Other" data-tone="coral">Other</button>
+        </div>
+
+        <!-- Three Outlined Pastel Feature Cards (Ref 2) -->
+        <div class="feature-trio-grid">
+          <div class="feature-pastel-card bg-mint">
+            <h3><i data-lucide="cpu" style="width:18px;height:18px;"></i> Fair Price Engine</h3>
+            <p>Weighted similarity pricing compares condition and age against 200 real campus sales in seconds.</p>
+          </div>
+          <div class="feature-pastel-card bg-pink">
+            <h3><i data-lucide="shield-check" style="width:18px;height:18px;"></i> Transparent Ranges</h3>
+            <p>Every listing displays clear min-max valuation context so neither seniors nor juniors overpay.</p>
+          </div>
+          <div class="feature-pastel-card bg-purple">
+            <h3><i data-lucide="map-pin" style="width:18px;height:18px;"></i> Zero-Fee Pickup</h3>
+            <p>Meet right at campus hostels, libraries, or department lobbies—₹0 shipping or middleman fees.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Marketplace Catalog & Search -->
+    <section id="marketplaceCatalog" class="container">
+      <div class="section-heading-wrap">
+        <span class="section-eyebrow">Live Campus Board</span>
+        <h2 class="section-title">
+          CAMPUS DEALS THAT <span class="word-box bg-yellow">POP!</span>
+        </h2>
+      </div>
+
+      <!-- Search & Filter Card -->
+      <div class="search-filter-card">
+        <div class="search-primary-row">
+          <div class="search-input-wrapper">
+            <i data-lucide="search"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search calculators, textbooks, bicycles, lab kits, furniture...">
+          </div>
+          <button class="btn btn-primary" onclick="App.executeSearch()">
+            <i data-lucide="search" style="width:16px;height:16px;"></i> Search
+          </button>
+        </div>
+
+        <div class="filter-secondary-row">
+          <div class="filter-group-left">
+            <select id="conditionFilter" class="filter-select" aria-label="Condition filter">
+              <option value="All">All Conditions</option>
+              <option value="Like New">Like New</option>
+              <option value="Excellent">Excellent</option>
+              <option value="Good">Good</option>
+              <option value="Fair">Fair</option>
+              <option value="Poor">Poor</option>
+            </select>
+
+            <div style="display:flex; align-items:center; gap:6px;">
+              <input type="number" id="minPriceInput" class="filter-price-input" placeholder="₹ Min" aria-label="Minimum price">
+              <span style="font-weight:700;">–</span>
+              <input type="number" id="maxPriceInput" class="filter-price-input" placeholder="₹ Max" aria-label="Maximum price">
+              <button class="btn btn-yellow btn-sm" id="applyPriceBtn">Apply</button>
+            </div>
+
+            <select id="sortFilter" class="filter-select" aria-label="Sort listings">
+              <option value="newest">Sort: Newly Listed</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="age-asc">Age: Newest First</option>
+            </select>
+
+            <button class="btn btn-secondary btn-sm" id="resetFiltersBtn" title="Reset all filters">
+              <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Reset
+            </button>
+          </div>
+
+          <div class="filter-stats-text tabular-nums" id="resultsCount">
+            Loading items...
+          </div>
+        </div>
+      </div>
+
+      <!-- Listings Grid -->
+      <div id="listingsGrid" class="listings-grid"></div>
+
+      <!-- Empty State -->
+      <div id="listingsEmptyState" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">📦</div>
+        <h3 class="empty-state-title">No Listings Match Your Search</h3>
+        <p class="empty-state-desc">Try clearing a filter or adjusting your keyword—or be the first senior to list this item!</p>
+        <button class="btn btn-yellow" data-view-target="sell">
+          <i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Post This Item
+        </button>
+      </div>
+    </section>
+
+    <!-- Yellow Stats Band (Ref 3 / Ref 5) -->
+    <section class="band band-yellow stats-band">
+      <div class="container">
+        <div class="stats-band-grid">
+          <div class="stats-band-card">
+            <div class="stats-band-value">200</div>
+            <div class="stats-band-label">Sales Analyzed</div>
+          </div>
+          <div class="stats-band-card">
+            <div class="stats-band-value">46.5%</div>
+            <div class="stats-band-label">Avg Value Retained</div>
+          </div>
+          <div class="stats-band-card">
+            <div class="stats-band-value">7</div>
+            <div class="stats-band-label">Campus Categories</div>
+          </div>
+          <div class="stats-band-card">
+            <div class="stats-band-value">₹0</div>
+            <div class="stats-band-label">Platform Fees</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Three Panels: How ReLoop Works (Ref 5) -->
+    <section class="how-it-works-section">
+      <div class="container">
+        <div class="section-heading-wrap">
+          <span class="section-eyebrow">Three Simple Panels</span>
+          <h2 class="section-title">
+            HOW RELOOP <span class="word-box bg-teal">WORKS</span>
+          </h2>
+          <p class="section-subtitle">From fair valuation to hostel handover in three quick steps.</p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <span class="step-num-badge bg-yellow">01</span>
+            <h3 class="step-title">Smart Fair Valuation</h3>
+            <p class="step-desc">Enter item age, condition, and original price. Our algorithm weighs 200 historical campus records to suggest an explainable price.</p>
+          </div>
+          <div class="step-card">
+            <span class="step-num-badge bg-pink">02</span>
+            <h3 class="step-title">Campus Handover</h3>
+            <p class="step-desc">Skip courier charges. Connect directly with incoming juniors for quick library, quad, or hostel pickup.</p>
+          </div>
+          <div class="step-card">
+            <span class="step-num-badge bg-sky">03</span>
+            <h3 class="step-title">Circular Savings</h3>
+            <p class="step-desc">Keep calculators, textbooks, lab kits, and bicycles circulating across batches while saving juniors up to 60%.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================================
+       VIEW 2: SELL AN ITEM & PRICING ENGINE (Ref 4 Numbered Boxes)
+       ========================================================================= -->
+  <section id="sell-view" class="app-view" style="display: none;">
+    <div class="container">
+      <div class="sell-shell">
+        <div class="sell-yellow-banner">
+          <div>
+            <h2>List an Item on ReLoop</h2>
+            <p>Check the fair resale value from 200 historical campus sales before you publish.</p>
+          </div>
+          <span class="tag">Explainable Pricing</span>
+        </div>
+
+        <!-- Judge Demo Shortcut -->
+        <div class="demo-scenario-banner">
+          <div>
+            <strong>Judge Benchmark Shortcut:</strong>
+            <span>Scientific Calculator · Calculators · Good · 24 mos · ₹1,200</span>
+          </div>
+          <button type="button" id="demoJudgeScenarioBtn" class="btn btn-primary btn-sm">
+            <i data-lucide="zap" style="width:14px;height:14px;"></i> Load Benchmark
+          </button>
+        </div>
+
+        <form id="sellItemForm">
+          <!-- Panel 1: About the Item -->
+          <div class="numbered-section">
+            <div class="numbered-section-head bg-mint">
+              <div class="numbered-section-title">
+                <span class="num-pill">1</span>
+                <span>About the Item</span>
+              </div>
+              <span class="tag">Required Fields</span>
+            </div>
+            <div class="numbered-section-body">
+              <div class="form-group">
+                <label class="form-label" for="sellItemName">
+                  <span>Item Name *</span>
+                  <span class="form-label-hint">e.g. Scientific Calculator fx-991ES</span>
+                </label>
+                <input type="text" id="sellItemName" class="form-control" placeholder="Enter item name or model" required>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="sellCategory">Category *</label>
+                  <select id="sellCategory" class="form-control" required>
+                    <option value="">Select Category</option>
+                    <option value="Calculators">Calculators</option>
+                    <option value="Books">Books</option>
+                    <option value="Cycles">Cycles</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Furniture">Furniture</option>
+                    <option value="Lab Equipment">Lab Equipment</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="sellCondition">Condition *</label>
+                  <select id="sellCondition" class="form-control" required>
+                    <option value="">Select Condition</option>
+                    <option value="Like New">Like New (Mint, barely touched)</option>
+                    <option value="Excellent">Excellent (Minor signs of use)</option>
+                    <option value="Good">Good (Fully functional, normal wear)</option>
+                    <option value="Fair">Fair (Noticeable cosmetic wear)</option>
+                    <option value="Poor">Poor (Heavily used, still working)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-grid-2" style="margin-bottom:0;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" for="sellAge">
+                    <span>Age in Months *</span>
+                    <span class="form-label-hint">Months used</span>
+                  </label>
+                  <input type="number" id="sellAge" class="form-control" placeholder="e.g. 24" min="0" max="120" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" for="sellOriginalPrice">
+                    <span>Original Price (₹) *</span>
+                    <span class="form-label-hint">Retail cost</span>
+                  </label>
+                  <input type="number" id="sellOriginalPrice" class="form-control" placeholder="e.g. 1200" min="50" required>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 2: Fair Price Check -->
+          <div class="numbered-section">
+            <div class="numbered-section-head bg-yellow">
+              <div class="numbered-section-title">
+                <span class="num-pill">2</span>
+                <span>Data-Driven Fair Price Check</span>
+              </div>
+              <span class="tag">200 SQLite Sales</span>
+            </div>
+            <div class="numbered-section-body">
+              <button type="button" id="calculatePriceBtn" class="btn btn-primary btn-lg" style="width: 100%;">
+                <i data-lucide="sparkles"></i> Get Fair Price
+              </button>
+
+              <!-- Pricing Result Card -->
+              <div id="pricingResultCard" class="pricing-result-card">
+                <div class="pricing-result-header">
+                  <span class="tag bg-teal">Fair Valuation Ready</span>
+                  <span class="tag" id="cardComparableCount">0 Comparable Sales</span>
+                </div>
+
+                <div class="pricing-highlight-row">
+                  <div>
+                    <div style="font-size:0.82rem; font-weight:700; text-transform:uppercase;">Recommended Price</div>
+                    <div class="suggested-price-amount" id="cardSuggestedPrice">₹0</div>
+                  </div>
+                  <div class="starburst-badge">
+                    <div style="font-family:var(--font-mono); font-size:0.7rem; font-weight:700;">FAIR RANGE</div>
+                    <div style="font-size:1.15rem; font-weight:800;" id="cardPriceRange">₹0 – ₹0</div>
+                  </div>
+                </div>
+
+                <div class="price-meter-track">
+                  <div class="price-meter-fill" id="cardPriceMeterFill"></div>
+                </div>
+
+                <div class="pricing-metrics-row">
+                  <span class="chip bg-peach" id="cardDepreciation">0% Depreciation</span>
+                  <span class="chip bg-mint" id="cardRetention">0% Value Retained</span>
+                </div>
+
+                <div class="pricing-explanation-box" id="cardExplanation">
+                  Recommendation explanation will appear here...
+                </div>
+
+                <div style="margin-top: 14px; text-align: right;">
+                  <button type="button" id="applySuggestedPriceBtn" class="btn btn-yellow btn-sm">
+                    <i data-lucide="check" style="width:14px;height:14px;"></i> Apply Recommended Price
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 3: Price & Publish -->
+          <div class="numbered-section">
+            <div class="numbered-section-head bg-pink">
+              <div class="numbered-section-title">
+                <span class="num-pill">3</span>
+                <span>Your Price &amp; Contact Details</span>
+              </div>
+              <span class="tag">Instant Publish</span>
+            </div>
+            <div class="numbered-section-body">
+              <div class="form-group">
+                <label class="form-label" for="sellSellingPrice">
+                  <span>Your Asking Price (₹) *</span>
+                  <span class="form-label-hint">Adjust or accept the suggested price</span>
+                </label>
+                <input type="number" id="sellSellingPrice" class="form-control" placeholder="Enter your selling price" min="10" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="sellDescription">Item Description</label>
+                <textarea id="sellDescription" class="form-control" placeholder="Condition notes, included accessories, or pickup preference..."></textarea>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="sellSellerName">Display Handle / Name</label>
+                  <input type="text" id="sellSellerName" class="form-control" placeholder="e.g. Panda_27 (EE 4th Yr)" value="Campus Senior">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="sellContact">Campus Contact</label>
+                  <input type="text" id="sellContact" class="form-control" placeholder="e.g. panda27@campus.example" value="senior@campus.example">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="sellImageUrl">
+                  <span>Image URL (Optional)</span>
+                  <span class="form-label-hint">Leave blank for category illustration</span>
+                </label>
+                <input type="url" id="sellImageUrl" class="form-control" placeholder="https://...">
+              </div>
+
+              <button type="submit" id="publishListingBtn" class="btn btn-teal btn-lg" style="width: 100%;">
+                <i data-lucide="check-circle-2"></i> Publish Listing
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       VIEW 3: PRICING INSIGHTS (Ref 5 Comic Panel Layout)
+       ========================================================================= -->
+  <section id="insights-view" class="app-view" style="display: none;">
+    <div class="container">
+      <div class="insights-header">
+        <div class="section-heading-wrap" style="margin-bottom:18px;">
+          <span class="section-eyebrow">200 Historical Campus Records</span>
+          <h2 class="section-title">
+            PRICING <span class="word-box bg-pink">INSIGHTS</span>
+          </h2>
+          <p class="section-subtitle">Live retention, condition impact, and age depreciation curves computed from SQLite.</p>
+        </div>
+      </div>
+
+      <div class="insights-stats-grid">
+        <div class="insight-stat-card bg-yellow">
+          <span class="tag">Dataset Size</span>
+          <span class="stat-card-value" id="statTotalTransactions">200</span>
+          <span style="font-size:0.82rem; font-weight:600;">Historical transactions</span>
+        </div>
+
+        <div class="insight-stat-card bg-teal">
+          <span class="tag">Avg Retention</span>
+          <span class="stat-card-value" id="statAvgResale">46.5%</span>
+          <span style="font-size:0.82rem; font-weight:600;">Value retained on resale</span>
+        </div>
+
+        <div class="insight-stat-card bg-mint">
+          <span class="tag">Best Retainer</span>
+          <span class="stat-card-value" id="statBestCategory" style="font-size:1.45rem;">Lab Equipment</span>
+          <span style="font-size:0.82rem; font-weight:600;" id="statBestCategorySub">60.9% Avg Retention</span>
+        </div>
+
+        <div class="insight-stat-card bg-peach">
+          <span class="tag">Fastest Drop</span>
+          <span class="stat-card-value" id="statWorstCategory" style="font-size:1.45rem;">Other</span>
+          <span style="font-size:0.82rem; font-weight:600;" id="statWorstCategorySub">62.7% Avg Depreciation</span>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-panel-head bg-yellow">
+            <h3 class="chart-title">Category Retention vs. Depreciation</h3>
+            <span class="tag">Panel 01</span>
+          </div>
+          <p class="chart-takeaway">Calculators &amp; lab gear hold value longest across semesters.</p>
+          <div class="chart-container">
+            <canvas id="categoryRetentionChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-panel-head bg-teal">
+            <h3 class="chart-title">Condition Grade Impact</h3>
+            <span class="tag">Panel 02</span>
+          </div>
+          <p class="chart-takeaway">Keeping items in Good or Excellent shape boosts resale by 15–25%.</p>
+          <div class="chart-container">
+            <canvas id="conditionRetentionChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-panel-head bg-pink">
+            <h3 class="chart-title">Age vs. Depreciation Curve</h3>
+            <span class="tag">Panel 03</span>
+          </div>
+          <p class="chart-takeaway">Most depreciation happens in year one before stabilizing in year two.</p>
+          <div class="chart-container">
+            <canvas id="ageDepreciationChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-panel-head bg-purple">
+            <h3 class="chart-title">Category Sample Breakdown</h3>
+            <span class="tag" style="color:#111111;">Panel 04</span>
+          </div>
+          <p class="chart-takeaway">Balanced 200-record sample across all 7 campus categories.</p>
+          <div class="chart-container">
+            <canvas id="categoryVolumeChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       VIEW 4: WANTED BOARD (Ref 5 Ledger Style)
+       ========================================================================= -->
+  <section id="wanted-view" class="app-view" style="display: none;">
+    <div class="container">
+      <div class="wanted-header-row">
+        <div>
+          <span class="section-eyebrow">Campus Needs Ledger</span>
+          <h2 class="section-title">
+            STUDENT <span class="word-box bg-sky" style="color:#FFFFFF;">WANTED</span> BOARD
+          </h2>
+          <p class="section-subtitle" style="margin-left:0;">Post what you need and let graduating seniors match with your budget.</p>
+        </div>
+        <button class="btn btn-primary" onclick="App.openModal('wantedModal')">
+          <i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Post a Request
+        </button>
+      </div>
+
+      <div class="wanted-ledger" id="wantedLedgerWrap">
+        <div class="wanted-ledger-head">
+          <span>Active Campus Requests</span>
+          <span id="wantedCountLabel">0 Open</span>
+        </div>
+        <div id="wantedGrid"></div>
+      </div>
+
+      <div id="wantedEmptyState" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">📝</div>
+        <h3 class="empty-state-title">No Open Requests Right Now</h3>
+        <p class="empty-state-desc">Need a calculator, cycle, or textbook? Post your max budget so seniors can reach out.</p>
+        <button class="btn btn-yellow" onclick="App.openModal('wantedModal')">
+          <i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Post First Request
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       MODALS
+       ========================================================================= -->
+  <div id="itemDetailModal" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Listing Details</h3>
+        <button class="modal-close-btn" data-close-modal="itemDetailModal" aria-label="Close modal">
+          <i data-lucide="x" style="width:18px;height:18px;"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="itemModalBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-close-modal="itemDetailModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="wantedModal" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Post a Wanted Request</h3>
+        <button class="modal-close-btn" data-close-modal="wantedModal" aria-label="Close modal">
+          <i data-lucide="x" style="width:18px;height:18px;"></i>
+        </button>
+      </div>
+      <form id="createWantedForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="wantedItemName">Item Name *</label>
+            <input type="text" id="wantedItemName" class="form-control" placeholder="e.g. Scientific Calculator or 26T Cycle" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="wantedCategory">Category *</label>
+              <select id="wantedCategory" class="form-control" required>
+                <option value="Calculators">Calculators</option>
+                <option value="Books">Books</option>
+                <option value="Cycles">Cycles</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Lab Equipment">Lab Equipment</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="wantedMaxBudget">Max Budget (₹) *</label>
+              <input type="number" id="wantedMaxBudget" class="form-control" placeholder="e.g. 700" min="50" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="wantedDescription">Description / Notes</label>
+            <textarea id="wantedDescription" class="form-control" placeholder="Preferred condition, model, or semester deadline..."></textarea>
+          </div>
+
+          <div class="form-grid-2" style="margin-bottom:0;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label" for="wantedRequester">Handle &amp; Year *</label>
+              <input type="text" id="wantedRequester" class="form-control" placeholder="e.g. Sprout_19 (CSE 1st Yr)" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label" for="wantedContact">Campus Contact *</label>
+              <input type="text" id="wantedContact" class="form-control" placeholder="e.g. sprout19@campus.example" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-close-modal="wantedModal">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">
+            <i data-lucide="check" style="width:15px;height:15px;"></i> Post Request
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation -->
+  <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+    <button class="mobile-bottom-btn active" data-view-target="marketplace">
+      <i data-lucide="store" style="width:18px;height:18px;"></i>
+      <span>Market</span>
+    </button>
+    <button class="mobile-bottom-btn" data-view-target="sell">
+      <i data-lucide="plus-circle" style="width:18px;height:18px;"></i>
+      <span>Sell</span>
+    </button>
+    <button class="mobile-bottom-btn" data-view-target="insights">
+      <i data-lucide="bar-chart-3" style="width:18px;height:18px;"></i>
+      <span>Insights</span>
+    </button>
+    <button class="mobile-bottom-btn" data-view-target="wanted">
+      <i data-lucide="bookmark" style="width:18px;height:18px;"></i>
+      <span>Wanted</span>
+    </button>
+  </nav>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- =========================================================================
+       Footer
+       ========================================================================= -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div>
+          <div class="footer-brand-title">Re<span>Loop</span></div>
+          <p class="footer-tagline">
+            Your Campus, Your Needs, Your Way. Built with Node.js, Express, SQLite, and explainable historical pricing.
+          </p>
+        </div>
+
+        <div class="footer-links-col">
+          <div class="footer-links-title">Explore</div>
+          <a class="footer-link" data-view-target="marketplace">Marketplace</a>
+          <a class="footer-link" data-view-target="sell">Sell an Item</a>
+          <a class="footer-link" data-view-target="insights">Pricing Insights</a>
+          <a class="footer-link" data-view-target="wanted">Wanted Board</a>
+        </div>
+
+        <div class="footer-links-col">
+          <div class="footer-links-title">Campus Promise</div>
+          <span class="footer-link">200 SQLite Sales Analyzed</span>
+          <span class="footer-link">Synthetic Demo Accounts Only</span>
+          <span class="footer-link">Zero Platform Fees</span>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        &copy; 2026 ReLoop Campus Circular Marketplace · Currency in INR (₹)
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

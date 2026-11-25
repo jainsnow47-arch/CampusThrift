@@ -1,0 +1,6 @@
+{
+  "name": "ReLoop",
+  "description": "Your Campus, Your Needs, Your Way — Smart campus circular marketplace with explainable fair pricing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

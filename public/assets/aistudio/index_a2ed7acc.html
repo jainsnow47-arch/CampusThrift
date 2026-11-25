@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReLoop – The Smart Campus Resale Marketplace</title>
+  <meta name="description" content="Connect college seniors and juniors for affordable campus essentials powered by a data-driven historical pricing engine.">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Chart.js for data analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Application CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- =========================================================================
+       Navigation Bar
+       ========================================================================= -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand-logo" data-view-target="marketplace">
+        <div class="logo-badge">
+          <i data-lucide="repeat"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">Re<span>Loop</span></span>
+          <span class="brand-tagline-nav">Smart Campus Resale</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li>
+            <button class="nav-btn active" data-view-target="marketplace">
+              <i data-lucide="store" style="width:16px;height:16px;"></i>
+              <span>Marketplace</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view-target="sell">
+              <i data-lucide="plus-circle" style="width:16px;height:16px;"></i>
+              <span>Sell an Item</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view-target="insights">
+              <i data-lucide="line-chart" style="width:16px;height:16px;"></i>
+              <span>Pricing Insights</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view-target="wanted">
+              <i data-lucide="bookmark" style="width:16px;height:16px;"></i>
+              <span>Wanted Board</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-secondary btn-sm" onclick="App.openModal('wantedModal')">
+          <i data-lucide="help-circle" style="width:15px;height:15px;"></i>
+          <span>Request Item</span>
+        </button>
+        <button class="btn btn-primary btn-sm" data-view-target="sell">
+          <i data-lucide="tag" style="width:15px;height:15px;"></i>
+          <span>Post Gear</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       VIEW 1: MARKETPLACE
+       ========================================================================= -->
+  <main id="marketplace-view" class="app-view">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container hero-content">
+        <div class="hero-pill">
+          <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+          Data-Driven Campus Circular Economy
+        </div>
+        <h1 class="hero-headline">
+          Don't Buy New. <span>Buy Smart.</span>
+        </h1>
+        <p class="hero-subtitle">
+          Discover affordable campus essentials, sell what you no longer need, and make every transaction count with fair historical pricing.
+        </p>
+
+        <!-- Stats row -->
+        <div class="hero-stats-row">
+          <div class="hero-stat-item">
+            <span class="hero-stat-value">200</span>
+            <span class="hero-stat-label">Historical Transactions Analyzed</span>
+          </div>
+          <div class="hero-stat-item">
+            <span class="hero-stat-value">62%</span>
+            <span class="hero-stat-label">Average Student Savings</span>
+          </div>
+          <div class="hero-stat-item">
+            <span class="hero-stat-value">100%</span>
+            <span class="hero-stat-label">Transparent Explainable Algorithm</span>
+          </div>
+          <div class="hero-stat-item">
+            <span class="hero-stat-value">₹0</span>
+            <span class="hero-stat-label">Commission & Middleman Fees</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Marketplace Content & Search -->
+    <section class="container" style="padding-top: 24px;">
+      <!-- Search & Filter Card -->
+      <div class="search-filter-card">
+        <div class="search-primary-row">
+          <div class="search-input-wrapper">
+            <i data-lucide="search"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search textbooks, scientific calculators, bicycles, lab kits, dorm furniture...">
+          </div>
+          <button class="btn btn-primary" onclick="App.executeSearch()">
+            <i data-lucide="search" style="width:16px;height:16px;"></i> Search
+          </button>
+        </div>
+
+        <!-- Category Pills Row -->
+        <div class="category-pills-row">
+          <button class="cat-pill active" data-category="All">
+            <i data-lucide="grid" style="width:14px;height:14px;"></i> All Items
+          </button>
+          <button class="cat-pill" data-category="Calculators">
+            <i data-lucide="calculator" style="width:14px;height:14px;"></i> Calculators
+          </button>
+          <button class="cat-pill" data-category="Books">
+            <i data-lucide="book-open" style="width:14px;height:14px;"></i> Books
+          </button>
+          <button class="cat-pill" data-category="Cycles">
+            <i data-lucide="bike" style="width:14px;height:14px;"></i> Cycles
+          </button>
+          <button class="cat-pill" data-category="Electronics">
+            <i data-lucide="laptop" style="width:14px;height:14px;"></i> Electronics
+          </button>
+          <button class="cat-pill" data-category="Furniture">
+            <i data-lucide="armchair" style="width:14px;height:14px;"></i> Furniture
+          </button>
+          <button class="cat-pill" data-category="Lab Equipment">
+            <i data-lucide="flask-conical" style="width:14px;height:14px;"></i> Lab Equipment
+          </button>
+          <button class="cat-pill" data-category="Other">
+            <i data-lucide="package" style="width:14px;height:14px;"></i> Other
+          </button>
+        </div>
+
+        <!-- Advanced Filter Row -->
+        <div class="filter-secondary-row">
+          <div class="filter-group-left">
+            <select id="conditionFilter" class="filter-select">
+              <option value="All">All Conditions</option>
+              <option value="Like New">Like New</option>
+              <option value="Excellent">Excellent</option>
+              <option value="Good">Good</option>
+              <option value="Fair">Fair</option>
+              <option value="Poor">Poor</option>
+            </select>
+
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:0.82rem; color:var(--text-muted);">Price:</span>
+              <input type="number" id="minPriceInput" class="filter-price-input" placeholder="₹ Min">
+              <span style="font-size:0.82rem; color:var(--text-muted);">-</span>
+              <input type="number" id="maxPriceInput" class="filter-price-input" placeholder="₹ Max">
+              <button class="btn btn-secondary btn-sm" id="applyPriceBtn">Apply</button>
+            </div>
+
+            <select id="sortFilter" class="filter-select">
+              <option value="newest">Sort: Newly Listed</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="age-asc">Age: Newest First</option>
+            </select>
+
+            <button class="btn btn-secondary btn-sm" id="resetFiltersBtn" title="Reset all filters">
+              <i data-lucide="rotate-ccw" style="width:13px;height:13px;"></i> Reset
+            </button>
+          </div>
+
+          <div class="filter-stats-text" id="resultsCount">
+            Loading items...
+          </div>
+        </div>
+      </div>
+
+      <!-- Listings Grid -->
+      <div id="listingsGrid" class="listings-grid">
+        <!-- Dynamic listing cards rendered here by app.js -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="listingsEmptyState" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">
+          <i data-lucide="package-search"></i>
+        </div>
+        <h3 class="empty-state-title">No Listings Match Your Search</h3>
+        <p class="empty-state-desc">Try clearing filters or adjusting your search keyword. Or be the first senior to list this item!</p>
+        <button class="btn btn-primary" data-view-target="sell">
+          <i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Post This Item
+        </button>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works-section">
+      <div class="container">
+        <div class="section-headline">
+          <h2 class="section-title">How ReLoop Works</h2>
+          <p class="section-subtitle">Bridging graduating seniors and incoming juniors through data transparency.</p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number-icon">
+              <i data-lucide="calculator"></i>
+            </div>
+            <h3 class="step-title">1. Smart Fair Valuation</h3>
+            <p class="step-desc">Enter your item details. Our engine queries 200 historical campus sales to calculate an explainable, fair price.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number-icon">
+              <i data-lucide="users"></i>
+            </div>
+            <h3 class="step-title">2. Campus Handover</h3>
+            <p class="step-desc">List without shipping hassle. Connect directly with peer juniors for hostel or library exchange.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number-icon">
+              <i data-lucide="leaf"></i>
+            </div>
+            <h3 class="step-title">3. Sustainable Campus</h3>
+            <p class="step-desc">Prevent usable books, cycles, and lab gear from going into campus dumpsters while saving juniors up to 60%.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================================
+       VIEW 2: SELL AN ITEM & DATA-DRIVEN PRICING ENGINE
+       ========================================================================= -->
+  <section id="sell-view" class="app-view" style="display: none;">
+    <div class="container">
+      <div class="sell-form-wrapper">
+        <div class="form-header">
+          <h2 class="form-title">List an Item for Resale</h2>
+          <p class="form-subtitle">Use ReLoop's data-driven algorithm to discover the fair resale price before publishing.</p>
+        </div>
+
+        <!-- Judge Demonstration Scenario Banner -->
+        <div class="demo-scenario-banner">
+          <div>
+            <div class="demo-scenario-text">
+              <strong>Judge Demo Mode:</strong> Want to test the Calculator benchmark scenario?
+            </div>
+            <div style="font-size:0.78rem; color:#166534;">
+              Scientific Calculator • Calculators • Good • 24 months • Original ₹1,200
+            </div>
+          </div>
+          <button type="button" id="demoJudgeScenarioBtn" class="btn btn-accent btn-sm">
+            <i data-lucide="zap" style="width:14px;height:14px;"></i> Load Benchmark
+          </button>
+        </div>
+
+        <!-- Main Listing Form -->
+        <form id="sellItemForm">
+          <div class="form-group">
+            <label class="form-label" for="sellItemName">
+              <span>Item Name *</span>
+              <span class="form-label-hint">e.g. Casio fx-991EX ClassWiz or Hero Sprint MTB</span>
+            </label>
+            <input type="text" id="sellItemName" class="form-control" placeholder="Enter item name or model" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="sellCategory">Category *</label>
+              <select id="sellCategory" class="form-control" required>
+                <option value="">Select Category</option>
+                <option value="Calculators">Calculators</option>
+                <option value="Books">Books</option>
+                <option value="Cycles">Cycles</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Lab Equipment">Lab Equipment</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sellCondition">Condition *</label>
+              <select id="sellCondition" class="form-control" required>
+                <option value="">Select Condition</option>
+                <option value="Like New">Like New (Mint, barely touched)</option>
+                <option value="Excellent">Excellent (Minor signs of use)</option>
+                <option value="Good">Good (Fully functional, normal wear)</option>
+                <option value="Fair">Fair (Noticeable cosmetic wear)</option>
+                <option value="Poor">Poor (Heavily used, still working)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="sellAge">
+                <span>Age in Months *</span>
+                <span class="form-label-hint">How many months old?</span>
+              </label>
+              <input type="number" id="sellAge" class="form-control" placeholder="e.g. 24" min="0" max="120" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sellOriginalPrice">
+                <span>Original Purchase Price (₹) *</span>
+                <span class="form-label-hint">What you paid new</span>
+              </label>
+              <input type="number" id="sellOriginalPrice" class="form-control" placeholder="e.g. 1200" min="50" required>
+            </div>
+          </div>
+
+          <!-- Action Button: Trigger Pricing Algorithm -->
+          <div style="margin: 8px 0 24px;">
+            <button type="button" id="calculatePriceBtn" class="btn btn-primary btn-lg" style="width: 100%;">
+              <i data-lucide="sparkles"></i> Get Fair Price
+            </button>
+          </div>
+
+          <!-- PRICING ENGINE RECOMMENDATION CARD (Appears upon calculation) -->
+          <div id="pricingResultCard" class="pricing-result-card">
+            <div class="pricing-result-header">
+              <span class="pricing-engine-badge">
+                <i data-lucide="cpu" style="width:13px;height:13px;"></i>
+                Data-Driven Pricing Engine Result
+              </span>
+              <span style="font-size:0.8rem; font-weight:700; color:#15803d;">Historical MySQL Algorithm</span>
+            </div>
+
+            <div class="pricing-highlight-row">
+              <div>
+                <div class="suggested-price-label">Recommended Resale Price</div>
+                <div class="suggested-price-amount" id="cardSuggestedPrice">₹0</div>
+              </div>
+
+              <div class="suggested-range-box">
+                <div class="suggested-range-label">Fair Campus Range</div>
+                <div class="suggested-range-val" id="cardPriceRange">₹0 - ₹0</div>
+              </div>
+            </div>
+
+            <!-- Price retention meter -->
+            <div class="price-meter-track">
+              <div class="price-meter-fill" id="cardPriceMeterFill"></div>
+            </div>
+
+            <!-- Key metrics pills -->
+            <div class="pricing-metrics-row">
+              <div class="pricing-metric-pill">
+                <i data-lucide="trending-down" style="width:14px;height:14px; color:#dc2626;"></i>
+                <span id="cardDepreciation">0% Depreciation</span>
+              </div>
+              <div class="pricing-metric-pill">
+                <i data-lucide="shield-check" style="width:14px;height:14px; color:#16a34a;"></i>
+                <span id="cardRetention">0% Retained Value</span>
+              </div>
+              <div class="pricing-metric-pill">
+                <i data-lucide="database" style="width:14px;height:14px; color:#2563eb;"></i>
+                <span id="cardComparableCount">0 Comparable Transactions</span>
+              </div>
+            </div>
+
+            <!-- Rationale Explanation Box -->
+            <div class="pricing-explanation-box" id="cardExplanation">
+              Recommendation explanation will appear here...
+            </div>
+
+            <div style="margin-top: 14px; text-align: right;">
+              <button type="button" id="applySuggestedPriceBtn" class="btn btn-secondary btn-sm">
+                <i data-lucide="check" style="width:14px;height:14px;"></i> Set My Price to Recommended Value
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Finalize Selling Price & Description -->
+          <div class="form-group">
+            <label class="form-label" for="sellSellingPrice">
+              <span>Your Selling Price (₹) *</span>
+              <span class="form-label-hint">You can adjust or accept the engine's suggested price</span>
+            </label>
+            <input type="number" id="sellSellingPrice" class="form-control" placeholder="Enter your target selling price" min="10" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="sellDescription">Item Description</label>
+            <textarea id="sellDescription" class="form-control" placeholder="Describe the item condition, history, included accessories, or reasons for selling..."></textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="sellSellerName">Seller Name & Department</label>
+              <input type="text" id="sellSellerName" class="form-control" placeholder="e.g. Rachit S. (EE 4th Yr)" value="Campus Senior">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sellContact">Campus Contact (Email / Hostel)</label>
+              <input type="text" id="sellContact" class="form-control" placeholder="e.g. rachit.ee@campus.edu or Room 214" value="senior@campus.edu">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="sellImageUrl">
+              <span>Item Image URL (Optional)</span>
+              <span class="form-label-hint">Leave blank for automatic category photo</span>
+            </label>
+            <input type="url" id="sellImageUrl" class="form-control" placeholder="https://images.unsplash.com/...">
+          </div>
+
+          <!-- Step 3: Publish Listing -->
+          <div style="margin-top: 24px;">
+            <button type="submit" id="publishListingBtn" class="btn btn-primary btn-lg" style="width: 100%;">
+              <i data-lucide="check-circle-2"></i> Publish Listing
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       VIEW 3: PRICING INSIGHTS & ANALYTICS DASHBOARD
+       ========================================================================= -->
+  <section id="insights-view" class="app-view" style="display: none;">
+    <div class="container">
+      <div class="insights-header">
+        <h2 class="section-title">Pricing Intelligence & Depreciation Trends</h2>
+        <p class="section-subtitle">Dynamically computed from our 200 historical campus transaction records in MySQL.</p>
+      </div>
+
+      <!-- Overview Stats Grid -->
+      <div class="insights-stats-grid">
+        <div class="insight-stat-card">
+          <div class="stat-icon-wrapper stat-icon-forest">
+            <i data-lucide="database"></i>
+          </div>
+          <span class="stat-card-title">Historical Transactions</span>
+          <span class="stat-card-value" id="statTotalTransactions">200</span>
+          <span class="stat-card-subtitle">Stored in MySQL DB</span>
+        </div>
+
+        <div class="insight-stat-card">
+          <div class="stat-icon-wrapper stat-icon-lime">
+            <i data-lucide="trending-up"></i>
+          </div>
+          <span class="stat-card-title">Average Resale Value</span>
+          <span class="stat-card-value" id="statAvgResale">48.1%</span>
+          <span class="stat-card-subtitle">Retained across all items</span>
+        </div>
+
+        <div class="insight-stat-card">
+          <div class="stat-icon-wrapper stat-icon-amber">
+            <i data-lucide="award"></i>
+          </div>
+          <span class="stat-card-title">Best Value Retainer</span>
+          <span class="stat-card-value" id="statBestCategory" style="font-size: 1.6rem;">Calculators</span>
+          <span class="stat-card-subtitle" id="statBestCategorySub">58.8% Avg Retention</span>
+        </div>
+
+        <div class="insight-stat-card">
+          <div class="stat-icon-wrapper stat-icon-blue">
+            <i data-lucide="trending-down"></i>
+          </div>
+          <span class="stat-card-title">Fastest Depreciating</span>
+          <span class="stat-card-value" id="statWorstCategory" style="font-size: 1.6rem;">Other</span>
+          <span class="stat-card-subtitle" id="statWorstCategorySub">60.7% Avg Depreciation</span>
+        </div>
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="charts-grid">
+        <!-- Chart 1: Category Retention & Depreciation -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Category Value Retention vs. Depreciation</h3>
+            <p class="chart-subtitle">Resale ratio = soldPrice / originalPrice across 7 campus categories</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="categoryRetentionChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Condition Grade Impact -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Condition Grade vs. Resale Retention</h3>
+            <p class="chart-subtitle">How item condition influences student resale price</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="conditionRetentionChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 3: Age vs Depreciation Curve -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Age vs. Depreciation Trend Curve</h3>
+            <p class="chart-subtitle">Depreciation pace grouped by item age brackets</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="ageDepreciationChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 4: Historical Category Distribution -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Historical Transaction Sample Breakdown</h3>
+            <p class="chart-subtitle">Dataset distribution across campus item types</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="categoryVolumeChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       VIEW 4: WANTED BOARD
+       ========================================================================= -->
+  <section id="wanted-view" class="app-view" style="display: none;">
+    <div class="container">
+      <div class="wanted-header-row">
+        <div>
+          <h2 class="section-title">Student Wanted Board</h2>
+          <p class="section-subtitle">Looking for something specific? Request gear here so graduating seniors can connect with you.</p>
+        </div>
+        <button class="btn btn-primary" onclick="App.openModal('wantedModal')">
+          <i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Post a Request
+        </button>
+      </div>
+
+      <!-- Wanted Cards Grid -->
+      <div id="wantedGrid" class="wanted-grid">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+
+      <!-- Wanted Empty State -->
+      <div id="wantedEmptyState" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">
+          <i data-lucide="clipboard-list"></i>
+        </div>
+        <h3 class="empty-state-title">No Open Requests Right Now</h3>
+        <p class="empty-state-desc">Need a textbook, bicycle, or calculator? Create a request and let campus seniors know!</p>
+        <button class="btn btn-primary" onclick="App.openModal('wantedModal')">
+          <i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Post First Request
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       MODAL 1: ITEM DETAILS MODAL
+       ========================================================================= -->
+  <div id="itemDetailModal" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Listing Details</h3>
+        <button class="modal-close-btn" data-close-modal="itemDetailModal">
+          <i data-lucide="x" style="width:20px;height:20px;"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="itemModalBody">
+        <!-- Injected dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal="itemDetailModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 2: CREATE WANTED REQUEST MODAL
+       ========================================================================= -->
+  <div id="wantedModal" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Post a Wanted Request</h3>
+        <button class="modal-close-btn" data-close-modal="wantedModal">
+          <i data-lucide="x" style="width:20px;height:20px;"></i>
+        </button>
+      </div>
+      <form id="createWantedForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="wantedItemName">Item Name *</label>
+            <input type="text" id="wantedItemName" class="form-control" placeholder="e.g. Scientific Calculator or 26T Cycle" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="wantedCategory">Category *</label>
+              <select id="wantedCategory" class="form-control" required>
+                <option value="Calculators">Calculators</option>
+                <option value="Books">Books</option>
+                <option value="Cycles">Cycles</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Lab Equipment">Lab Equipment</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="wantedMaxBudget">Max Budget (₹) *</label>
+              <input type="number" id="wantedMaxBudget" class="form-control" placeholder="e.g. 700" min="50" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="wantedDescription">Description / Specifications</label>
+            <textarea id="wantedDescription" class="form-control" placeholder="Mention preferred models, urgency, or semester requirements..."></textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="wantedRequester">Your Name & Year</label>
+              <input type="text" id="wantedRequester" class="form-control" placeholder="e.g. Kavya (CSE 1st Yr)" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="wantedContact">Campus Contact (Email / Hostel)</label>
+              <input type="text" id="wantedContact" class="form-control" placeholder="e.g. kavya.cse@campus.edu" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="wantedModal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="check" style="width:16px;height:16px;"></i> Post Request
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- =========================================================================
+       Footer
+       ========================================================================= -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand-col">
+          <div class="footer-brand-title">Re<span>Loop</span></div>
+          <p class="footer-tagline">
+            "Your old stuff. Someone else's new beginning."<br>
+            A smart, data-driven campus resale marketplace built with Node.js, Express, and MySQL.
+          </p>
+        </div>
+
+        <div class="footer-links-col">
+          <div class="footer-links-title">Marketplace</div>
+          <a class="footer-link" data-view-target="marketplace">Browse Active Gear</a>
+          <a class="footer-link" data-view-target="sell">Sell Campus Items</a>
+          <a class="footer-link" data-view-target="wanted">Student Wanted Board</a>
+        </div>
+
+        <div class="footer-links-col">
+          <div class="footer-links-title">Data & Intelligence</div>
+          <a class="footer-link" data-view-target="insights">Pricing Insights Dashboard</a>
+          <a class="footer-link" data-view-target="sell">Fair Price Calculator</a>
+          <span class="footer-link" style="color:#64748b;">200 MySQL Records Analyzed</span>
+        </div>
+
+        <div class="footer-links-col">
+          <div class="footer-links-title">Campus Hub</div>
+          <span class="footer-link">Peer to Peer Handover</span>
+          <span class="footer-link">Hostel & Library Pickups</span>
+          <span class="footer-link">100% Commission Free</span>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        &copy; 2026 ReLoop Marketplace. Designed for Campus Circular Economy. Built with Node.js, Express, MySQL & Chart.js.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
