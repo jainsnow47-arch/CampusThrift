@@ -1439,6 +1439,7 @@ const App = {
     const visible = this.getVisibleApproachingEvents();
     if (!visible.length) {
       banner.style.display = 'none';
+      banner.classList.remove('is-entering');
       banner.innerHTML = '';
       return;
     }
@@ -1461,7 +1462,10 @@ const App = {
       )
       .join('');
 
+    const wasHidden = banner.style.display === 'none' || !banner.innerHTML.trim();
+    const prevSlug = banner.getAttribute('data-active-slug');
     banner.style.display = 'flex';
+    banner.setAttribute('data-active-slug', ev.slug || '');
     banner.innerHTML = `
       <div class="event-spotlight-left">
         <img src="${this.escapeHtml(thumbSrc)}" alt="${this.escapeHtml(ev.eventName)}" class="event-spotlight-thumb" referrerPolicy="no-referrer" onerror="this.style.display='none'">
@@ -1495,6 +1499,12 @@ const App = {
         </button>
       </div>
     `;
+
+    if (wasHidden || prevSlug !== (ev.slug || '')) {
+      banner.classList.remove('is-entering');
+      void banner.offsetWidth;
+      banner.classList.add('is-entering');
+    }
 
     if (window.lucide) window.lucide.createIcons();
   },

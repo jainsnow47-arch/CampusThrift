@@ -2245,6 +2245,31 @@ textarea.form-control {
 /* --------------------------------------------------------------------------
    CAMPUS EVENT CALENDAR & CONTEXTUAL BANNER
    -------------------------------------------------------------------------- */
+@keyframes eventSpotlightEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+    box-shadow: 1px 1px 0 var(--ink);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    box-shadow: var(--shadow);
+  }
+}
+
+@keyframes eventTagPop {
+  0% {
+    transform: scale(0.92);
+  }
+  65% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .event-spotlight-banner {
   background: var(--peach);
   border: var(--border);
@@ -2257,6 +2282,21 @@ textarea.form-control {
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+}
+
+.event-spotlight-banner.is-entering {
+  animation: eventSpotlightEnter 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.event-spotlight-banner.is-entering .tag {
+  animation: eventTagPop 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-spotlight-banner.is-entering,
+  .event-spotlight-banner.is-entering .tag {
+    animation: none !important;
+  }
 }
 
 .event-spotlight-left {
