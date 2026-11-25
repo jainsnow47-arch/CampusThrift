@@ -43,7 +43,12 @@ const CATEGORY_THUMBNAILS = {
 
 function resolveImageUrl(category, imageUrl) {
   const cleaned = imageUrl ? String(imageUrl).trim() : '';
-  if (cleaned && (/^https?:\/\//i.test(cleaned) || /^data:image\//i.test(cleaned))) {
+  if (
+    cleaned &&
+    (/^https?:\/\//i.test(cleaned) ||
+      /^data:image\//i.test(cleaned) ||
+      /^\/(?:src\/)?assets\/images\/[a-zA-Z0-9._-]+$/i.test(cleaned))
+  ) {
     return cleaned;
   }
   return CATEGORY_THUMBNAILS[category] || CATEGORY_THUMBNAILS.Other;

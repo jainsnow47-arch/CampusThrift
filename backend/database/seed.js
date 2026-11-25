@@ -201,7 +201,7 @@ const DEFAULT_LISTINGS = [
     collectionLocation: 'Chemistry Block Locker 4',
     specialConditions: 'Return washed and buttoned after lab week.',
     description: 'Clean cotton chemistry & engineering lab coat. Borrow free for weekly practicals.',
-    imageUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80'
+    imageUrl: '/src/assets/images/chemistry_lab_coat_1795605744378.jpg'
   },
   {
     handle: 'SolderPro',
@@ -302,7 +302,7 @@ const DEFAULT_LISTINGS = [
     transactionType: 'SELL',
     collectionLocation: 'Hostel Block C Lobby',
     description: 'Breathable mesh back with adjustable lumbar support and height adjustment. Saved my back during exam season.',
-    imageUrl: 'https://images.unsplash.com/photo-1580481077195-c9f280a58145?auto=format&fit=crop&w=600&q=80'
+    imageUrl: '/src/assets/images/ergonomic_study_chair_1795605632378.jpg'
   },
   {
     handle: 'Otter_42',
@@ -320,7 +320,7 @@ const DEFAULT_LISTINGS = [
     collectionLocation: 'Mechanical Workshop Desk',
     specialConditions: 'Free lending for 1st-year studio sessions. Keep scale clamp intact.',
     description: 'Complete with scale clamp and carry case. Borrow free for your Engineering Graphics assignments!',
-    imageUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80'
+    imageUrl: '/src/assets/images/mini_drafter_board_1795605744265.jpg'
   },
   {
     handle: 'Boba_19',
@@ -354,7 +354,7 @@ const DEFAULT_LISTINGS = [
     collectionLocation: 'Central Library Steps',
     specialConditions: 'No highlighting or dog-earing pages please.',
     description: 'Covers M1, M2, and M3 modules completely. Free semester exam borrow for juniors.',
-    imageUrl: 'https://images.unsplash.com/photo-1532012164546-f432f2e3777f?auto=format&fit=crop&w=600&q=80'
+    imageUrl: '/src/assets/images/engineering_math_book_1795605633295.jpg'
   },
   {
     handle: 'PixelPanda',
@@ -370,7 +370,7 @@ const DEFAULT_LISTINGS = [
     transactionType: 'SELL',
     collectionLocation: 'Placement Cell Corridor',
     description: 'Worn twice for final-year campus placement interviews. Dry-cleaned blazer + crisp white formal shirt.',
-    imageUrl: ''
+    imageUrl: '/src/assets/images/navy_interview_blazer_1795605633795.jpg'
   },
   {
     handle: 'Mochi_14',
@@ -389,7 +389,60 @@ const DEFAULT_LISTINGS = [
     collectionLocation: 'Cultural Club Room, Block A',
     specialConditions: 'Return dry/clean after Dandiya Night weekend.',
     description: 'Bright festive kurta with matching wooden dandiya sticks and dupatta accessory set.',
-    imageUrl: ''
+    imageUrl: '/src/assets/images/festive_kurta_dandiya_1795605634497.jpg'
+  },
+  {
+    handle: 'Mochi_14',
+    itemName: 'Embroidered Bandhani Chaniya Choli & Dupatta Set',
+    category: 'Other',
+    condition: 'Like New',
+    ageInMonths: 8,
+    originalPrice: 2800,
+    suggestedPrice: null,
+    sellingPrice: 110,
+    rentalPricePerDay: 110,
+    minDurationDays: 1,
+    maxDurationDays: 3,
+    refundableDeposit: 400,
+    transactionType: 'RENT',
+    collectionLocation: 'Girls Hostel Common Room',
+    specialConditions: 'Return dry and aired within 2 days after Dandiya Night.',
+    description: 'Vibrant magenta & gold Bandhani chaniya choli clothes set with mirror-work blouse and embroidered dupatta for Garba & Dandiya Night.',
+    imageUrl: '/src/assets/images/dandiya_chaniya_choli_1795605633186.jpg'
+  },
+  {
+    handle: 'Boba_19',
+    itemName: 'Oxidized Silver Jhumka & Kundan Bangles Jewelry Set',
+    category: 'Other',
+    condition: 'Like New',
+    ageInMonths: 5,
+    originalPrice: 550,
+    suggestedPrice: 300,
+    sellingPrice: 280,
+    minAcceptablePrice: 240,
+    willingToNegotiate: 1,
+    transactionType: 'SELL',
+    collectionLocation: 'Student Activity Center Desk',
+    description: 'Statement oxidized silver peacock jhumkas paired with colorful kundan festive bangles—complete Dandiya Night jewelry set.',
+    imageUrl: '/src/assets/images/oxidized_jhumka_bangles_1795605635532.jpg'
+  },
+  {
+    handle: 'Pixel_Fox',
+    itemName: 'Handcrafted Mirror-Work Choker & Oxidized Anklets',
+    category: 'Other',
+    condition: 'Excellent',
+    ageInMonths: 9,
+    originalPrice: 480,
+    suggestedPrice: null,
+    sellingPrice: 0,
+    transactionType: 'BORROW',
+    minDurationDays: 1,
+    maxDurationDays: 3,
+    refundableDeposit: 150,
+    collectionLocation: 'Cultural Club Room, Block A',
+    specialConditions: 'Free campus borrow for Dandiya Night! Return with clasp intact.',
+    description: 'Traditional Gujarati mirror-work fabric choker jewelry with ghungroo oxidized silver anklets for Garba/Dandiya outfits.',
+    imageUrl: '/src/assets/images/mirror_choker_anklets_1795605637043.jpg'
   }
 ];
 
@@ -468,11 +521,11 @@ function buildConfiguredEvents() {
       slug: 'dandiya-night',
       eventName: 'Dandiya Night',
       eventDate: datePlusDays(11),
-      description: 'Annual campus Garba & Dandiya evening at the Main Quad. Rent or swap traditional kurtas, ethnic accessories, and dandiya sticks.',
-      bannerMessage: 'Dandiya night is coming! Explore pre-loved outfits and accessories from your campus.',
+      description: 'Annual campus Garba & Dandiya evening at the Main Quad. Rent or buy traditional kurtas, chaniya choli clothes, oxidized jhumka jewelry, bangles, and dandiya sticks.',
+      bannerMessage: 'Dandiya night is coming! Explore pre-loved festive clothes, oxidized jewelry, and dandiya accessories from your campus.',
       relevantCategories: JSON.stringify(['Other']),
-      keywords: JSON.stringify(['dandiya', 'kurta', 'festive', 'ethnic', 'outfit', 'accessories']),
-      imageUrl: makeEventSvg('#F7A8C4', '#FFC93C', 'CULTURAL NIGHT', '<line x1="150" y1="140" x2="225" y2="72" stroke="#111111" stroke-width="9" stroke-linecap="round"/><line x1="250" y1="140" x2="175" y2="72" stroke="#111111" stroke-width="9" stroke-linecap="round"/><circle cx="200" cy="106" r="10" fill="#3CC4B3" stroke="#111111" stroke-width="3"/>')
+      keywords: JSON.stringify(['dandiya', 'kurta', 'chaniya', 'choli', 'dupatta', 'festive', 'ethnic', 'outfit', 'clothes', 'jewelry', 'jewellery', 'jhumka', 'bangles', 'choker', 'anklets', 'oxidized', 'garba', 'accessories']),
+      imageUrl: '/src/assets/images/dandiya_night_event_1795605636051.jpg'
     },
     {
       slug: 'campus-hackathon',
@@ -561,7 +614,7 @@ function seedData(db) {
       @collectionLocation, @specialConditions, @description, @sellerName, @contactInfo, @imageUrl
     )
   `);
-  const updateImageStmt = db.prepare('UPDATE listings SET image_url = ? WHERE id = ? AND (image_url IS NULL OR image_url = \'\')');
+  const updateImageStmt = db.prepare('UPDATE listings SET image_url = ? WHERE id = ?');
 
   if (fallbackUser) {
     db.prepare(
@@ -569,12 +622,65 @@ function seedData(db) {
     ).run(fallbackUser.id, `${fallbackUser.handle} ${fallbackUser.avatar_emoji}`);
   }
 
+  const inferRealisticPhoto = (itemName, category) => {
+    const lower = String(itemName || '').toLowerCase();
+    if (lower.includes('lab coat')) return '/src/assets/images/chemistry_lab_coat_1795605744378.jpg';
+    if (lower.includes('drafter') || lower.includes('drawing board')) return '/src/assets/images/mini_drafter_board_1795605744265.jpg';
+    if (lower.includes('guitar')) return '/src/assets/images/acoustic_guitar_kit_1795605744685.jpg';
+    if (lower.includes('study table') || lower.includes('wooden') || lower.includes('table')) return '/src/assets/images/wooden_study_table_1795605743286.jpg';
+    if (lower.includes('chair')) return '/src/assets/images/ergonomic_study_chair_1795605632378.jpg';
+    if (lower.includes('grewal') || lower.includes('mathematics')) return '/src/assets/images/engineering_math_book_1795605633295.jpg';
+    if (lower.includes('blazer') || lower.includes('formal')) return '/src/assets/images/navy_interview_blazer_1795605633795.jpg';
+    if (lower.includes('chaniya') || lower.includes('choli')) return '/src/assets/images/dandiya_chaniya_choli_1795605633186.jpg';
+    if (lower.includes('kurta') || lower.includes('dandiya')) return '/src/assets/images/festive_kurta_dandiya_1795605634497.jpg';
+    if (lower.includes('jhumka') || lower.includes('bangles')) return '/src/assets/images/oxidized_jhumka_bangles_1795605635532.jpg';
+    if (lower.includes('choker') || lower.includes('anklet')) return '/src/assets/images/mirror_choker_anklets_1795605637043.jpg';
+    if (lower.includes('calculator') || category === 'Calculators') {
+      return 'https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?auto=format&fit=crop&w=600&q=80';
+    }
+    if (lower.includes('algorithm') || lower.includes('clrs') || category === 'Books') {
+      return 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80';
+    }
+    if (lower.includes('cycle') || lower.includes('bike') || category === 'Cycles') {
+      return 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=600&q=80';
+    }
+    if (lower.includes('arduino') || category === 'Electronics') {
+      return 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80';
+    }
+    if (category === 'Furniture') return '/src/assets/images/wooden_study_table_1795605743286.jpg';
+    if (category === 'Lab Equipment') return '/src/assets/images/mini_drafter_board_1795605744265.jpg';
+    return '/src/assets/images/festive_kurta_dandiya_1795605634497.jpg';
+  };
+
+  // Backfill any legacy rows with empty or broken/shared placeholder photos
+  const allCurrentListings = db.prepare('SELECT id, item_name AS itemName, category, image_url AS imageUrl FROM listings').all();
+  const backfillMissingTx = db.transaction((rows) => {
+    for (const row of rows) {
+      const curImg = String(row.imageUrl || '').trim();
+      const needsFix =
+        !curImg ||
+        curImg.includes('1580481077195') ||
+        curImg.includes('1532012164546') ||
+        curImg.includes('1581092160607');
+      if (needsFix) {
+        updateImageStmt.run(inferRealisticPhoto(row.itemName, row.category), row.id);
+      }
+    }
+  });
+  backfillMissingTx(allCurrentListings);
+
   let addedListings = 0;
   const seedListingsTx = db.transaction((items) => {
     for (const item of items) {
       const existing = existingByName.get(item.itemName.toLowerCase());
       if (existing) {
-        if (!existing.imageUrl && item.imageUrl) {
+        const curImg = String(existing.imageUrl || '');
+        const needsPhotoUpgrade =
+          !curImg ||
+          curImg.includes('1580481077195') ||
+          curImg.includes('1532012164546') ||
+          curImg.includes('1581092160607');
+        if (needsPhotoUpgrade && item.imageUrl) {
           updateImageStmt.run(item.imageUrl, existing.id);
         }
         continue;
@@ -632,13 +738,20 @@ function seedData(db) {
   });
   insertWantedTx(DEFAULT_WANTED);
 
-  // 5. Configured Campus Events (idempotent by slug)
+  // 5. Configured Campus Events (idempotent by slug, refreshes copy/keywords/artwork)
   const configuredEvents = buildConfiguredEvents();
   const upsertEvent = db.prepare(`
-    INSERT OR IGNORE INTO campus_events
+    INSERT INTO campus_events
       (slug, event_name, event_date, description, banner_message, relevant_categories, keywords, image_url)
     VALUES
       (@slug, @eventName, @eventDate, @description, @bannerMessage, @relevantCategories, @keywords, @imageUrl)
+    ON CONFLICT(slug) DO UPDATE SET
+      event_name = excluded.event_name,
+      description = excluded.description,
+      banner_message = excluded.banner_message,
+      relevant_categories = excluded.relevant_categories,
+      keywords = excluded.keywords,
+      image_url = excluded.image_url
   `);
   const seedEventsTx = db.transaction((events) => {
     for (const ev of events) upsertEvent.run(ev);

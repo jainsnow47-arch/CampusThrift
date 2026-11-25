@@ -40,8 +40,9 @@ function getMatchForEvent(listing, eventObj) {
     }
   }
 
+  const isGenericOther = String(listing.category).toLowerCase() === 'other';
   const catMatch = categories.some((c) => String(c).toLowerCase() === String(listing.category).toLowerCase());
-  if (catMatch) {
+  if (catMatch && (!isGenericOther || matchedKeywords.length > 0 || keywords.length === 0)) {
     score += 2;
   }
 

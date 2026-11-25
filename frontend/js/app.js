@@ -511,6 +511,7 @@ const App = {
                 alt="${this.escapeHtml(item.itemName)}"
                 class="listing-thumb"
                 loading="lazy"
+                referrerPolicy="no-referrer"
                 onerror="this.onerror=null;this.src='${fallbackImg}';"
               >
               ${this.getConditionBadgeHtml(item.condition)}
@@ -829,7 +830,7 @@ const App = {
               <span class="tag">${this.escapeHtml(item.category)}</span>
             </div>
             <div class="numbered-section-body">
-              <img src="${this.escapeHtml(this.safeImageUrl(item.imageUrl, this.getFallbackImage(item.category)))}" alt="${this.escapeHtml(item.itemName)}" onerror="this.onerror=null;this.src='${this.getFallbackImage(item.category)}';" style="width:100%; height:210px; object-fit:cover; border-radius:10px; border:2.5px solid #111111; margin-bottom:14px;">
+              <img src="${this.escapeHtml(this.safeImageUrl(item.imageUrl, this.getFallbackImage(item.category)))}" alt="${this.escapeHtml(item.itemName)}" referrerPolicy="no-referrer" onerror="this.onerror=null;this.src='${this.getFallbackImage(item.category)}';" style="width:100%; height:210px; object-fit:cover; border-radius:10px; border:2.5px solid #111111; margin-bottom:14px;">
               <p style="font-size:0.92rem; line-height:1.55; margin-bottom:12px;">${this.escapeHtml(item.description || 'Well-kept campus essential ready for its next semester.')}</p>
               <div style="display:flex; gap:8px; flex-wrap:wrap; font-family:var(--font-mono); font-size:0.75rem;">
                 <span class="tag">Original: ₹${Number(item.originalPrice).toLocaleString('en-IN')}</span>
@@ -1463,7 +1464,7 @@ const App = {
     banner.style.display = 'flex';
     banner.innerHTML = `
       <div class="event-spotlight-left">
-        <img src="${this.escapeHtml(thumbSrc)}" alt="${this.escapeHtml(ev.eventName)}" class="event-spotlight-thumb" onerror="this.style.display='none'">
+        <img src="${this.escapeHtml(thumbSrc)}" alt="${this.escapeHtml(ev.eventName)}" class="event-spotlight-thumb" referrerPolicy="no-referrer" onerror="this.style.display='none'">
         <div>
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
             <span class="tag bg-yellow">${this.escapeHtml(ev.countdownLabel)}</span>
@@ -1567,7 +1568,7 @@ const App = {
               <span>${this.escapeHtml(ev.countdownLabel)} · ${this.escapeHtml(ev.eventDate)}</span>
               <span class="tag" style="background:#FFFFFF;">${statusLabel}</span>
             </div>
-            ${safeImg ? `<img src="${this.escapeHtml(safeImg)}" alt="${this.escapeHtml(ev.eventName)}" class="event-card-img">` : ''}
+            ${safeImg ? `<img src="${this.escapeHtml(safeImg)}" alt="${this.escapeHtml(ev.eventName)}" class="event-card-img" referrerPolicy="no-referrer">` : ''}
             <div class="event-card-body">
               <h3 style="font-size:1.1rem; font-weight:800;">${this.escapeHtml(ev.eventName)}</h3>
               <p style="font-size:0.86rem; color:var(--ink-muted); line-height:1.45;">${this.escapeHtml(ev.description)}</p>
@@ -1632,6 +1633,7 @@ const App = {
                 alt="${this.escapeHtml(item.itemName)}"
                 class="listing-thumb"
                 loading="lazy"
+                referrerPolicy="no-referrer"
                 onerror="this.onerror=null;this.src='${fallbackImg}';"
               >
               ${this.getConditionBadgeHtml(item.condition)}
@@ -2060,7 +2062,11 @@ const App = {
   safeImageUrl(url, fallback = '') {
     if (!url || typeof url !== 'string') return fallback;
     const trimmed = url.trim();
-    if (/^https?:\/\//i.test(trimmed) || /^data:image\/svg\+xml/i.test(trimmed)) {
+    if (
+      /^https?:\/\//i.test(trimmed) ||
+      /^data:image\/svg\+xml/i.test(trimmed) ||
+      /^\/(?:src\/)?assets\/images\/[a-zA-Z0-9._-]+$/i.test(trimmed)
+    ) {
       return trimmed;
     }
     return fallback;
