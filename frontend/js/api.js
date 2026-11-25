@@ -77,6 +77,24 @@ const Api = {
     return data.user;
   },
 
+  async getPublicUserProfile(userId) {
+    const res = await fetch(`${API_BASE_URL}/auth/users/${userId}/profile`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to load peer profile');
+    return data;
+  },
+
+  async verifyCampus(campusCredential) {
+    const res = await fetch(`${API_BASE_URL}/auth/verify-campus`, {
+      method: 'POST',
+      headers: this.authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ campusCredential })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Campus verification failed');
+    return data.user;
+  },
+
   // 1. Pricing Engine APIs
   async suggestPricing(itemData) {
     const res = await fetch(`${API_BASE_URL}/pricing/suggest`, {
@@ -164,5 +182,64 @@ const Api = {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to submit wanted request');
     return data.data;
+  },
+
+  // 4. Transactions & Post-Completion Ratings APIs
+  async getMyTransactions() {
+    const res = await fetch(`${API_BASE_URL}/transactions`, {
+      headers: this.authHeaders()
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to load transactions');
+    return data.data;
+  },
+
+  async createTransactionRequest(payload) {
+    const res = await fetch(`${API_BASE_URL}/transactions`, {
+      method: 'POST',
+      headers: this.authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to submit request');
+    return data.data;
+  },
+
+  async updateTransactionStatus(id, action) {
+    const res = await fetch(`${API_BASE_URL}/transactions/${id}/status`, {
+      method: 'PATCH',
+      headers: this.authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ action })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to update transaction');
+    return data.data;
+  },
+
+  async submitRating(payload) {
+    const res = await fetch(`${API_BASE_URL}/ratings`, {
+      method: 'POST',
+      headers: this.authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to submit rating');
+    return data.data;
+  },
+
+  // 5. Campus Event Calendar APIs
+  async getCampusEvents() {
+    const res = await fetch(`${API_BASE_URL}/events`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to fetch campus events');
+    return data.data;
+  },
+
+  async getApproachingEvents() {
+    const res = await fetch(`${API_BASE_URL}/events/approaching`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to fetch approaching events');
+    return data.data;
   }
 };
+

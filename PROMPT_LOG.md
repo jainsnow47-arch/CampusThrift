@@ -11,6 +11,9 @@
 ### Phase 1 Update: Showcase Dummy Data, Card Visual Polish & Rename to Campus Thrift
 > "Add the dummy data in this and change the name of the project from ReLoop to Campus Thrift."
 
+### Phase 2: Profile Badges, Post-Completion Ratings & Campus Event Calendar
+> "Add profile badge section and ratings, plus the Campus Event Calendar feature with a manageable event dataset (Placement drives, Dandiya night, College festivals, Hackathons, Farewell, Semester examinations), contextual dismissible banners for approaching events, and grounded event recommendations."
+
 ---
 
 ## 2. Architecture & Design Decisions
@@ -18,12 +21,15 @@
 1. **CommonJS Backend Inside ESM Root**:
    - Kept root `package.json` compatible with Vite while configuring `backend/package.json` with `"type": "commonjs"` so Express routes, controllers, and `better-sqlite3` remain clean CommonJS modules.
 2. **Zero-Config SQLite with Non-Destructive Schema Upgrade**:
-   - `backend/config/db.js` runs `backend/database/schema.sql` and executes `ensureUnifiedListingColumns(db)` via `PRAGMA table_info(listings)` to safely add Phase 1 columns to pre-existing SQLite databases without losing Step 1 data.
-3. **Server-Side Privacy & Ownership**:
-   - `min_acceptable_price` is excluded from `SELECT_LISTING_COLUMNS` in `backend/controllers/listingController.js`, ensuring it never leaks in `GET /api/listings`, `GET /api/listings/search`, `GET /api/listings/:id`, or `POST /api/listings`.
-   - `POST /api/listings` resolves `seller_id` from the authenticated Bearer token (`req.user`) rather than trusting frontend-supplied seller IDs.
-4. **Deterministic Little Loops Service**:
+   - `backend/config/db.js` runs `backend/database/schema.sql` and executes `ensureUnifiedListingColumns(db)` via `PRAGMA table_info` to safely add columns (`campus_verified_roll`, unified listing columns) and new tables (`transactions`, `ratings`, `campus_events`) to pre-existing SQLite databases without losing Step 1 data.
+3. **Server-Side Privacy, Ownership & Rating Integrity**:
+   - `min_acceptable_price` is excluded from `SELECT_LISTING_COLUMNS` in `backend/controllers/listingController.js` and `backend/services/eventService.js`, ensuring it never leaks in listings or event recommendations.
+   - `POST /api/listings` resolves `seller_id` from the authenticated Bearer token (`req.user`).
+   - `POST /api/ratings` enforces `status === 'COMPLETED'`, participant membership, server-derived `rateeId` (blocking self-ratings), and `UNIQUE(transaction_id, rater_id)` (returning `409` on duplicate ratings).
+   - `POST /api/auth/verify-campus` validates roll ID or `.edu`/`.ac.in` email patterns instead of auto-verifying accounts.
+4. **Deterministic Little Loops & Grounded Event Recommendations**:
    - `backend/services/mascotService.js` generates category- and transaction-type-aware first-person messages without calling any external LLM API.
+   - `backend/services/eventService.js` reads strictly from configured `campus_events` rows and matches `AVAILABLE` listings by category and keyword overlap, keeping approaching banners inline and dismissible via `localStorage`.
 
 ---
 
@@ -44,14 +50,14 @@
 
 ---
 
-## 4. Phase 1 Verification Checklist
+## 4. Verification Checklist
 
 - [x] SQLite auto-creates tables and seeds 200 historical rows without duplication on restart.
-- [x] `POST /api/pricing/suggest` benchmark (`Scientific Calculator`, `Calculators`, `Good`, `24`, `1200`) preserved and verified.
+- [x] `POST /api/pricing/suggest` benchmark (`Scientific Calculator`, `Calculators`, `Good`, `24`, `1200`) preserved and verified (`₹700`, range `₹620–₹780`).
 - [x] `GET /api/pricing/insights` and Chart.js visualizations preserved.
 - [x] Pseudonymous demo auth (`/api/auth/personas`, `/api/auth/demo-login`, `/api/auth/me`, `/api/auth/profile`) working.
 - [x] Unified `SELL`, `SWAP`, `BORROW`, `RENT` listing creation, search filtering, and 4-panel Listing Detail view working.
-- [x] `minAcceptablePrice` verified absent from all public API responses.
-- [x] Little Loops deterministic item mascots verified on cards and detail view.
-- [x] Showcase dummy data (11 demo users, 10 unified listings, 4 wanted requests) seeded idempotently with offline SVG image fallbacks.
-- [x] Project renamed from `ReLoop` to `Campus Thrift` across UI, backend metadata, and documentation.
+- [x] `minAcceptablePrice` verified absent from all public API responses (including event recommendations).
+- [x] Profile Badges, Campus Verification (`POST /api/auth/verify-campus`), and Peer Inspector working from SQLite-derived metrics.
+- [x] Transaction request -> accept -> dual-confirm `COMPLETED` -> mutual Post-Completion Ratings (`POST /api/ratings`) working with duplicate & incomplete-tx guards.
+- [x] Campus Event Calendar (`/api/events`, `/api/events/approaching`) and dismissible Marketplace event spotlight banner verified.

@@ -60,6 +60,18 @@
               <span>Wanted</span>
             </button>
           </li>
+          <li>
+            <button class="nav-btn" data-view-target="events">
+              <i data-lucide="calendar" style="width:15px;height:15px;"></i>
+              <span>Events</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view-target="profile">
+              <i data-lucide="award" style="width:15px;height:15px;"></i>
+              <span>Profile</span>
+            </button>
+          </li>
         </ul>
       </nav>
 
@@ -191,6 +203,9 @@
 
     <!-- Marketplace Catalog & Search -->
     <section id="marketplaceCatalog" class="container">
+      <!-- Dismissible Approaching Campus Event Banner (Driven strictly by configured DB events) -->
+      <div id="eventSpotlightBanner" class="event-spotlight-banner" style="display:none;"></div>
+
       <div class="section-heading-wrap">
         <span class="section-eyebrow">Live Campus Board</span>
         <h2 class="section-title">
@@ -828,6 +843,100 @@
   </section>
 
   <!-- =========================================================================
+       VIEW 5: CAMPUS EVENT CALENDAR & CONTEXTUAL RECOMMENDATIONS
+       ========================================================================= -->
+  <section id="events-view" class="app-view" style="display: none;">
+    <div class="container">
+      <div class="events-shell">
+        <div class="sell-yellow-banner" style="margin-bottom:24px;">
+          <div>
+            <span class="tag" style="margin-bottom:8px;">Configured Campus Calendar</span>
+            <h2>Campus Event Calendar</h2>
+            <p>Upcoming campus milestones surface relevant pre-loved gear—no pop-up spam, always dismissible.</p>
+          </div>
+          <button type="button" id="restoreDismissedEventsBtn" class="btn btn-secondary btn-sm" style="display:none;" onclick="App.restoreDismissedEvents()">
+            <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Restore Dismissed Banners
+          </button>
+        </div>
+
+        <div id="eventsTimelineGrid" class="events-grid"></div>
+
+        <div id="eventRecsSection" class="numbered-section" style="margin-top:28px; display:none;">
+          <div class="numbered-section-head bg-teal">
+            <div class="numbered-section-title">
+              <i data-lucide="sparkles" style="width:18px;height:18px;"></i>
+              <span id="eventRecsHeading">Recommended for Event</span>
+            </div>
+            <span class="tag" id="eventRecsCountTag">0 Matches</span>
+          </div>
+          <div class="numbered-section-body">
+            <p id="eventRecsSubtext" style="font-size:0.9rem; color:var(--ink-muted); margin-bottom:18px;"></p>
+            <div id="eventRecsGrid" class="listings-grid" style="margin-bottom:0;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       VIEW 6: PROFILE, TRUST BADGES, CAMPUS VERIFICATION & PEER RATINGS
+       ========================================================================= -->
+  <section id="profile-view" class="app-view" style="display: none;">
+    <div class="container">
+      <div class="profile-shell">
+        <div class="sell-yellow-banner" style="background:var(--mint); margin-bottom:22px;">
+          <div>
+            <span class="tag" style="margin-bottom:8px;">Pseudonymous Trust &amp; Badges</span>
+            <h2>Campus Profile, Badges &amp; Ratings</h2>
+            <p>All trust indicators and badges are computed directly from verified status, completed exchanges, and peer ratings.</p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="App.openAuthModal()">
+            <i data-lucide="users" style="width:15px;height:15px;"></i> Switch Persona
+          </button>
+        </div>
+
+        <!-- Peer Inspector Strip -->
+        <div class="search-filter-card" style="margin-bottom:22px; padding:14px 18px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:10px;">
+            <span style="font-family:var(--font-mono); font-size:0.74rem; font-weight:700; text-transform:uppercase;">Inspect Student Badges &amp; Ratings</span>
+            <button type="button" class="btn btn-yellow btn-sm" onclick="App.loadProfileView()">
+              My Profile
+            </button>
+          </div>
+          <div id="profilePeerDirectory" class="peer-directory-row"></div>
+        </div>
+
+        <!-- Top Profile + Verification + Badges Panels -->
+        <div id="profileOverviewMount"></div>
+
+        <!-- My Exchanges & Post-Completion Rating Actions (Visible for active signed-in user) -->
+        <div id="myTransactionsSection" class="numbered-section" style="margin-top:22px;">
+          <div class="numbered-section-head bg-yellow">
+            <div class="numbered-section-title">
+              <span class="num-pill">🔁</span>
+              <span>My Exchanges &amp; Post-Completion Ratings</span>
+            </div>
+            <span class="tag" id="myTransactionsCountTag">0 Exchanges</span>
+          </div>
+          <div class="numbered-section-body" id="myTransactionsBody"></div>
+        </div>
+
+        <!-- Ratings Received Feed -->
+        <div class="numbered-section" style="margin-top:22px;">
+          <div class="numbered-section-head bg-pink">
+            <div class="numbered-section-title">
+              <span class="num-pill">⭐</span>
+              <span id="ratingsReceivedHeading">Peer Ratings Received</span>
+            </div>
+            <span class="tag" id="ratingsReceivedCountTag">0 Ratings</span>
+          </div>
+          <div class="numbered-section-body" id="ratingsReceivedBody"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
        MODALS
        ========================================================================= -->
   <div id="authModal" class="modal-overlay">
@@ -841,9 +950,14 @@
       <div class="modal-body">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
           <span class="tag bg-mint">Pseudonymous · Privacy-First</span>
-          <button type="button" id="randomPersonaBtn" class="btn btn-yellow btn-sm">
-            <i data-lucide="shuffle" style="width:14px;height:14px;"></i> New Random Identity
-          </button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="App.closeModal('authModal'); App.switchView('profile');">
+              <i data-lucide="award" style="width:14px;height:14px;"></i> My Badges &amp; Ratings
+            </button>
+            <button type="button" id="randomPersonaBtn" class="btn btn-yellow btn-sm">
+              <i data-lucide="shuffle" style="width:14px;height:14px;"></i> New Random Identity
+            </button>
+          </div>
         </div>
 
         <div style="font-family:var(--font-mono); font-size:0.74rem; font-weight:700; text-transform:uppercase; margin-bottom:8px;">Switch Demo Persona</div>
@@ -941,23 +1055,68 @@
     </div>
   </div>
 
+  <!-- Rating Modal (Completed Transactions Only) -->
+  <div id="ratingModal" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Rate Completed Exchange</h3>
+        <button class="modal-close-btn" data-close-modal="ratingModal" aria-label="Close modal">
+          <i data-lucide="x" style="width:18px;height:18px;"></i>
+        </button>
+      </div>
+      <form id="submitRatingForm">
+        <input type="hidden" id="ratingTransactionId">
+        <div class="modal-body">
+          <div id="ratingTargetSummary" class="little-loop-mini" style="margin-top:0; margin-bottom:16px;"></div>
+
+          <div class="form-group">
+            <label class="form-label">Overall Star Rating *</label>
+            <input type="hidden" id="ratingScoreInput" value="5">
+            <div id="starPickerRow" class="star-picker-row">
+              <button type="button" class="star-choice active" data-score="1">★ 1</button>
+              <button type="button" class="star-choice active" data-score="2">★ 2</button>
+              <button type="button" class="star-choice active" data-score="3">★ 3</button>
+              <button type="button" class="star-choice active" data-score="4">★ 4</button>
+              <button type="button" class="star-choice active" data-score="5">★ 5</button>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="ratingFeedbackInput">Short Feedback (Optional)</label>
+            <textarea id="ratingFeedbackInput" class="form-control" maxlength="300" placeholder="Punctual handover, item matched description, easy communication..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-close-modal="ratingModal">Cancel</button>
+          <button type="submit" class="btn btn-teal btn-sm">
+            <i data-lucide="star" style="width:15px;height:15px;"></i> Submit Rating
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Mobile Bottom Navigation -->
   <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
     <button class="mobile-bottom-btn active" data-view-target="marketplace">
-      <i data-lucide="store" style="width:18px;height:18px;"></i>
+      <i data-lucide="store" style="width:17px;height:17px;"></i>
       <span>Market</span>
     </button>
     <button class="mobile-bottom-btn" data-view-target="sell">
-      <i data-lucide="plus-circle" style="width:18px;height:18px;"></i>
+      <i data-lucide="plus-circle" style="width:17px;height:17px;"></i>
       <span>Sell</span>
     </button>
-    <button class="mobile-bottom-btn" data-view-target="insights">
-      <i data-lucide="bar-chart-3" style="width:18px;height:18px;"></i>
-      <span>Insights</span>
+    <button class="mobile-bottom-btn" data-view-target="events">
+      <i data-lucide="calendar" style="width:17px;height:17px;"></i>
+      <span>Events</span>
     </button>
     <button class="mobile-bottom-btn" data-view-target="wanted">
-      <i data-lucide="bookmark" style="width:18px;height:18px;"></i>
+      <i data-lucide="bookmark" style="width:17px;height:17px;"></i>
       <span>Wanted</span>
+    </button>
+    <button class="mobile-bottom-btn" data-view-target="profile">
+      <i data-lucide="award" style="width:17px;height:17px;"></i>
+      <span>Profile</span>
     </button>
   </nav>
 
@@ -980,6 +1139,8 @@
           <div class="footer-links-title">Explore</div>
           <a class="footer-link" data-view-target="marketplace">Marketplace</a>
           <a class="footer-link" data-view-target="sell">Sell an Item</a>
+          <a class="footer-link" data-view-target="events">Campus Events</a>
+          <a class="footer-link" data-view-target="profile">Profile &amp; Badges</a>
           <a class="footer-link" data-view-target="insights">Pricing Insights</a>
           <a class="footer-link" data-view-target="wanted">Wanted Board</a>
         </div>

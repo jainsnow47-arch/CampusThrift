@@ -4,6 +4,8 @@ const {
   listDemoPersonas,
   demoLogin,
   getCurrentUser,
+  getPublicUserProfile,
+  verifyCampusAccount,
   updateProfile,
   logout
 } = require('../controllers/authController');
@@ -14,6 +16,8 @@ const router = express.Router();
 router.get('/personas', listDemoPersonas);
 router.post('/demo-login', demoLogin);
 router.get('/me', requireAuth, getCurrentUser);
+router.get('/users/:id/profile', getPublicUserProfile);
+router.post('/verify-campus', requireAuth, verifyCampusAccount);
 
 router.patch(
   '/profile',
@@ -33,3 +37,4 @@ router.patch(
 router.post('/logout', attachSessionUser, logout);
 
 module.exports = router;
+

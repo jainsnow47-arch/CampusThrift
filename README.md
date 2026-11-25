@@ -25,6 +25,9 @@ Campus Thrift is a campus-specific circular marketplace engineered for college s
 - `historical_transactions`: Exactly 200 synthetic historical campus transactions across 7 categories.
 - `listings`: Unified listing table supporting `SELL`, `SWAP`, `BORROW`, and `RENT` with type-specific attributes and private `min_acceptable_price` (never returned by public APIs).
 - `wanted_requests`: Student item request board.
+- `transactions`: Lightweight peer exchange lifecycle (`REQUESTED`, `ACCEPTED`, dual-confirmed `COMPLETED`, `CANCELLED`).
+- `ratings`: Post-completion 1–5 star ratings with optional feedback and `UNIQUE(transaction_id, rater_id)` constraint.
+- `campus_events`: Configured campus calendar dataset (`event_name`, `event_date`, `description`, `banner_message`, `relevant_categories`, `keywords`, optional SVG `image_url`).
 
 ---
 
@@ -43,6 +46,12 @@ Campus Thrift is a campus-specific circular marketplace engineered for college s
    - Live Chart.js insights dashboard (`/api/pricing/insights`).
 6. **Neo-Brutalist UI Redesign**:
    - Top segmented navigation, identity chip with `Demo` badge, scrolling ink ticker strip, category & mode filters, showcase listing cards with colored mode headers, condition pills, verified tags, 4 comic-cover transaction mode cards, Neo-Brutalist toggle switches, and a 4-panel Listing Detail view.
+7. **Profile Badges, Campus Verification & Post-Completion Ratings**:
+   - Real SQLite-derived trust badges (`Campus Verified`, `Completed Exchange`/`Campus Regular`, `Helpful Lender`, `Swap Partner`, `Top Rated Peer`) and peer inspector view.
+   - Explicit campus student verification (`POST /api/auth/verify-campus` validating roll ID or `.edu`/`.ac.in` email without auto-verifying invalid inputs).
+   - Mutual post-completion ratings (`1–5` stars + optional feedback) unlocked only after a transaction reaches `COMPLETED`, preventing self-ratings and duplicate ratings.
+8. **Campus Event Calendar & Contextual Recommendations**:
+   - Configured SQLite calendar (`Semester Examinations`, `Campus Placement Drive`, `Dandiya Night`, `Campus Hackathon`, `Annual College Festival`, `Senior Farewell`) surfacing matching `AVAILABLE` items with short explainable reasons and dismissible approaching-event banners.
 
 ---
 
@@ -96,6 +105,24 @@ On startup, Campus Thrift automatically:
 |---|---|---|
 | `GET` | `/api/wanted` | List all active wanted requests |
 | `POST` | `/api/wanted` | Create a new wanted request |
+
+### Trust Profiles, Transactions & Ratings (`/api/auth`, `/api/transactions`, `/api/ratings`)
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/auth/users/:id/profile` | Public peer profile with SQLite-computed trust metrics, earned badges, and ratings |
+| `POST` | `/api/auth/verify-campus` | Verify current user with a valid campus roll ID or `.edu`/`.ac.in` email |
+| `GET` | `/api/transactions` | List transactions involving the authenticated user |
+| `POST` | `/api/transactions` | Submit a purchase, swap, borrow, or rental request on an available listing |
+| `PATCH` | `/api/transactions/:id/status` | Accept, dual-confirm completion (`COMPLETED`), or cancel an exchange |
+| `POST` | `/api/ratings` | Submit a `1–5` star rating for the peer on a `COMPLETED` transaction (one per rater per tx) |
+| `GET` | `/api/ratings/user/:userId` | Retrieve ratings received by a student |
+
+### Campus Event Calendar (`/api/events`)
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/events` | List all configured campus events with matching `AVAILABLE` listings and match reasons |
+| `GET` | `/api/events/approaching` | List approaching configured events (`0–21` days out) for the dismissible marketplace banner |
+| `GET` | `/api/events/:id` | Retrieve a single configured event and its recommended listings |
 
 ---
 

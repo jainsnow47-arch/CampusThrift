@@ -62,6 +62,13 @@ const App = {
   allowedEmojis: ['🐼', '🍡', '🦊', '🐨', '🦦', '🍁', '🦉', '🐝', '🐢', '🌵', '🚀', '🎨'],
   allListings: [],
   pricingSuggestion: null,
+  approachingEvents: [],
+  activeEventIndex: 0,
+  allEvents: [],
+  selectedEventId: null,
+  viewedProfileUserId: null,
+  myTransactions: [],
+  DISMISSED_EVENTS_KEY: 'campus_thrift_dismissed_events',
 
   async init() {
     this.bindNavigation();
@@ -70,9 +77,10 @@ const App = {
     this.bindSellForm();
     this.bindWantedForm();
     this.bindModals();
+    this.bindRatingModal();
 
     await this.bootstrapAuth();
-    await this.loadMarketplace();
+    await Promise.all([this.loadMarketplace(), this.loadApproachingEventBanner()]);
 
     if (window.lucide) {
       window.lucide.createIcons();
@@ -144,6 +152,9 @@ const App = {
         this.personas = personasRes.data || this.personas;
         this.setCurrentUser(user);
         this.renderListings(this.filterAndSortClientCache());
+        if (document.getElementById('profile-view')?.style.display === 'block') {
+          await this.loadProfileView();
+        }
         this.showToast(`Switched to ${user.avatarEmoji} ${user.handle}`, 'success');
       } catch (err) {
         this.showToast(err.message, 'error');
@@ -165,6 +176,9 @@ const App = {
         this.setCurrentUser(updated);
         this.closeModal('authModal');
         await this.loadMarketplace();
+        if (document.getElementById('profile-view')?.style.display === 'block') {
+          await this.loadProfileView();
+        }
         this.showToast(`Profile updated: ${updated.avatarEmoji} ${updated.handle}`, 'success');
       } catch (err) {
         this.showToast(err.message, 'error');
@@ -217,6 +231,9 @@ const App = {
             const user = await Api.demoLogin(handle);
             this.setCurrentUser(user);
             this.renderListings(this.filterAndSortClientCache());
+            if (document.getElementById('profile-view')?.style.display === 'block') {
+              await this.loadProfileView();
+            }
             this.showToast(`Active persona: ${user.avatarEmoji} ${user.handle}`, 'info');
           } catch (err) {
             this.showToast(err.message, 'error');
@@ -292,10 +309,15 @@ const App = {
 
     if (viewName === 'marketplace') {
       this.executeSearch();
+      this.renderEventSpotlightBanner();
     } else if (viewName === 'insights') {
       this.loadInsights();
     } else if (viewName === 'wanted') {
       this.loadWanted();
+    } else if (viewName === 'events') {
+      this.loadEventsView();
+    } else if (viewName === 'profile') {
+      this.loadProfileView(this.viewedProfileUserId);
     }
 
     if (window.lucide) window.lucide.createIcons();
@@ -472,6 +494,7 @@ const App = {
           department: 'ALL',
           isVerified: false
         };
+        const sellerTrust = item.sellerTrust || {};
         const isOwner = this.currentUser && item.sellerId && Number(item.sellerId) === Number(this.currentUser.id);
         const fallbackImg = this.getFallbackImage(item.category);
 
@@ -484,7 +507,7 @@ const App = {
 
             <div class="listing-thumb-container" style="cursor:pointer;" onclick="App.openListingDetail(${item.id})">
               <img
-                src="${this.escapeHtml(item.imageUrl || fallbackImg)}"
+                src="${this.escapeHtml(this.safeImageUrl(item.imageUrl, fallbackImg))}"
                 alt="${this.escapeHtml(item.itemName)}"
                 class="listing-thumb"
                 loading="lazy"
@@ -513,6 +536,11 @@ const App = {
                     <span>${this.escapeHtml(seller.avatarEmoji || '🐼')}</span>
                     <span>${this.escapeHtml(seller.handle)}</span>
                   </button>
+                  ${
+                    sellerTrust.ratingCount > 0 && sellerTrust.averageRating !== null
+                      ? `<button type="button" class="verified-pill" style="background:#FFF9E6; border-color:#111111; color:#111111; cursor:pointer;" title="View peer badges & ratings" onclick="App.inspectPeerProfile(${Number(seller.id || item.sellerId)})">★ ${sellerTrust.averageRating}</button>`
+                      : ''
+                  }
                   ${
                     seller.isVerified
                       ? `<span class="verified-pill"><i data-lucide="check-circle" style="width:11px;height:11px;"></i> Verified</span>`
@@ -627,8 +655,10 @@ const App = {
       if (idTag) idTag.innerText = `Listing #${item.id} · ${item.transactionType}`;
 
       const mascot = item.littleLoop || { emoji: '✨', name: 'Little Loop', message: 'Ready for campus!' };
-      const seller = item.sellerProfile || { handle: item.sellerName || 'Panda_27', avatarEmoji: '🐼', department: 'Campus Student (Demo)', isDemo: true, isVerified: false };
+      const seller = item.sellerProfile || { id: item.sellerId, handle: item.sellerName || 'Panda_27', avatarEmoji: '🐼', department: 'Campus Student (Demo)', isDemo: true, isVerified: false };
+      const sellerTrust = item.sellerTrust || { isVerified: seller.isVerified, completedCount: 0, averageRating: null, ratingCount: 0, badges: [] };
       const isOwner = this.currentUser && item.sellerId && Number(item.sellerId) === Number(this.currentUser.id);
+      const isAvailable = String(item.availabilityStatus || 'AVAILABLE').toUpperCase() === 'AVAILABLE';
       const type = item.transactionType || 'SELL';
 
       let box2Html = '';
@@ -702,6 +732,67 @@ const App = {
         `;
       }
 
+      const ratingDisplay =
+        sellerTrust.ratingCount > 0 && sellerTrust.averageRating !== null
+          ? `★ ${sellerTrust.averageRating}/5 (${sellerTrust.ratingCount})`
+          : 'New Peer';
+      const sellerBadgePills = (sellerTrust.badges || [])
+        .slice(0, 3)
+        .map(
+          (b) =>
+            `<span class="chip bg-${this.escapeHtml(b.tone || 'mint')}" style="font-size:0.72rem;">${this.escapeHtml(b.emoji)} ${this.escapeHtml(b.label)}</span>`
+        )
+        .join('');
+
+      let requestFormHtml = '';
+      if (!isOwner && isAvailable) {
+        let modeInputs = '';
+        if (type === 'SELL') {
+          modeInputs = `
+            <div class="form-group" style="margin-bottom:10px;">
+              <label class="form-label" for="reqProposedPrice">Your Offer (₹)</label>
+              <input type="number" id="reqProposedPrice" class="form-control" min="1" value="${Number(item.sellingPrice || 0)}" ${item.willingToNegotiate ? '' : 'readonly'}>
+            </div>
+          `;
+        } else if (type === 'SWAP') {
+          modeInputs = `
+            <div class="form-group" style="margin-bottom:10px;">
+              <label class="form-label" for="reqSwapOffer">Item You Are Offering to Swap *</label>
+              <input type="text" id="reqSwapOffer" class="form-control" maxlength="200" placeholder="e.g. Data Structures textbook + Casio fx-82MS">
+            </div>
+          `;
+        } else {
+          modeInputs = `
+            <div class="form-grid-2" style="margin-bottom:10px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="reqStartDate">Pickup Date</label>
+                <input type="date" id="reqStartDate" class="form-control">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="reqEndDate">Return Date</label>
+                <input type="date" id="reqEndDate" class="form-control">
+              </div>
+            </div>
+          `;
+        }
+
+        const actionLabel =
+          type === 'SELL' ? 'Request Purchase' : type === 'SWAP' ? 'Propose Swap' : type === 'BORROW' ? 'Request Borrow' : 'Request Rental';
+
+        requestFormHtml = `
+          <form id="detailRequestForm" style="margin-bottom:12px;">
+            ${modeInputs}
+            <div class="form-group" style="margin-bottom:12px;">
+              <label class="form-label" for="reqNote">Meetup Note (Optional)</label>
+              <input type="text" id="reqNote" class="form-control" maxlength="300" placeholder="e.g. Can pick up near Central Library at 4 PM">
+            </div>
+            <button type="submit" class="btn btn-teal btn-sm" style="width:100%;">
+              <i data-lucide="send" style="width:14px;height:14px;"></i> ${actionLabel}
+            </button>
+          </form>
+        `;
+      }
+
       container.innerHTML = `
         <div class="sell-yellow-banner" style="margin-bottom:18px;">
           <div>
@@ -738,7 +829,7 @@ const App = {
               <span class="tag">${this.escapeHtml(item.category)}</span>
             </div>
             <div class="numbered-section-body">
-              <img src="${this.escapeHtml(item.imageUrl || this.getFallbackImage(item.category))}" alt="${this.escapeHtml(item.itemName)}" onerror="this.onerror=null;this.src='${this.getFallbackImage(item.category)}';" style="width:100%; height:210px; object-fit:cover; border-radius:10px; border:2.5px solid #111111; margin-bottom:14px;">
+              <img src="${this.escapeHtml(this.safeImageUrl(item.imageUrl, this.getFallbackImage(item.category)))}" alt="${this.escapeHtml(item.itemName)}" onerror="this.onerror=null;this.src='${this.getFallbackImage(item.category)}';" style="width:100%; height:210px; object-fit:cover; border-radius:10px; border:2.5px solid #111111; margin-bottom:14px;">
               <p style="font-size:0.92rem; line-height:1.55; margin-bottom:12px;">${this.escapeHtml(item.description || 'Well-kept campus essential ready for its next semester.')}</p>
               <div style="display:flex; gap:8px; flex-wrap:wrap; font-family:var(--font-mono); font-size:0.75rem;">
                 <span class="tag">Original: ₹${Number(item.originalPrice).toLocaleString('en-IN')}</span>
@@ -766,9 +857,9 @@ const App = {
             <div class="numbered-section-head bg-pink">
               <div class="numbered-section-title">
                 <span class="num-pill">3</span>
-                <span>Seller</span>
+                <span>Seller &amp; Trust</span>
               </div>
-              <span class="tag">${seller.isVerified ? 'Campus Verified' : 'Demo Profile'}</span>
+              <span class="tag">${sellerTrust.isVerified ? 'Campus Verified' : 'Demo Profile'}</span>
             </div>
             <div class="numbered-section-body">
               <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
@@ -778,9 +869,21 @@ const App = {
                   <span style="font-size:0.84rem; color:var(--ink-muted);">${this.escapeHtml(seller.department || 'Campus Student (Demo)')}</span>
                 </div>
               </div>
-              <p style="font-size:0.82rem; color:var(--ink-muted);">
-                Pseudonymous campus identity protects student privacy—real names and private reserve prices are never exposed.
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                <span class="chip bg-yellow">${this.escapeHtml(ratingDisplay)}</span>
+                <span class="chip bg-mint">${Number(sellerTrust.completedCount || 0)} Completed Loops</span>
+                ${sellerBadgePills}
+              </div>
+              <p style="font-size:0.82rem; color:var(--ink-muted); margin-bottom:12px;">
+                Pseudonymous identity protects student privacy—badges and ratings come strictly from completed exchanges.
               </p>
+              ${
+                seller.id
+                  ? `<button type="button" class="btn btn-secondary btn-sm" onclick="App.inspectPeerProfile(${Number(seller.id)})">
+                       <i data-lucide="award" style="width:14px;height:14px;"></i> Inspect Badges &amp; Ratings
+                     </button>`
+                  : ''
+              }
             </div>
           </div>
 
@@ -790,11 +893,18 @@ const App = {
                 <span class="num-pill">4</span>
                 <span>Request / Offer</span>
               </div>
-              <span class="tag" style="color:#111111;">Campus Handover</span>
+              <span class="tag" style="color:#111111;">${this.escapeHtml(item.availabilityStatus || 'AVAILABLE')}</span>
             </div>
             <div class="numbered-section-body">
-              <p style="font-size:0.88rem; margin-bottom:14px;">
-                Status: <strong>${this.escapeHtml(item.availabilityStatus || 'AVAILABLE')}</strong>. Reach out using the student’s pseudonymous campus handle to coordinate a safe in-person meetup.
+              ${requestFormHtml}
+              <p style="font-size:0.84rem; color:var(--ink-muted); margin-bottom:12px;">
+                ${
+                  isOwner
+                    ? 'You own this listing. Track incoming requests and handover confirmations in your Profile.'
+                    : isAvailable
+                      ? 'Send a request above or copy the pseudonymous handle to coordinate on campus. Ratings unlock once both peers confirm completion.'
+                      : 'This listing is currently reserved or completed.'
+                }
               </p>
               <div style="display:flex; gap:10px; flex-wrap:wrap;">
                 <button type="button" class="btn btn-yellow btn-sm" onclick="App.copyCampusHandle('${this.escapeHtml(seller.handle)}')">
@@ -813,7 +923,43 @@ const App = {
         </div>
       `;
 
+      document.getElementById('detailRequestForm')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.submitListingRequest(item.id, type);
+      });
+
       this.switchView('detail');
+    } catch (err) {
+      this.showToast(err.message, 'error');
+    }
+  },
+
+  async submitListingRequest(listingId, type) {
+    try {
+      const payload = {
+        listingId,
+        note: document.getElementById('reqNote')?.value.trim() || ''
+      };
+
+      if (type === 'SELL') {
+        const raw = document.getElementById('reqProposedPrice')?.value;
+        if (raw) payload.proposedPrice = parseFloat(raw);
+      } else if (type === 'SWAP') {
+        const swapOffer = document.getElementById('reqSwapOffer')?.value.trim() || '';
+        if (!swapOffer) {
+          this.showToast('Please describe the item you are offering to swap.', 'error');
+          return;
+        }
+        payload.swapOffer = swapOffer;
+      } else {
+        payload.startDate = document.getElementById('reqStartDate')?.value || '';
+        payload.endDate = document.getElementById('reqEndDate')?.value || '';
+      }
+
+      await Api.createTransactionRequest(payload);
+      this.showToast('Request sent! Track handover and rate once completed in Profile.', 'success');
+      this.viewedProfileUserId = this.currentUser?.id || null;
+      this.switchView('profile');
     } catch (err) {
       this.showToast(err.message, 'error');
     }
@@ -1219,8 +1365,707 @@ const App = {
   },
 
   // ------------------------------------------------------------------------
+  // CAMPUS EVENT CALENDAR & DISMISSIBLE RECOMMENDATIONS
+  // ------------------------------------------------------------------------
+  getDismissedEventSlugs() {
+    try {
+      const raw = localStorage.getItem(this.DISMISSED_EVENTS_KEY);
+      const parsed = JSON.parse(raw || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  },
+
+  setDismissedEventSlugs(slugs) {
+    try {
+      localStorage.setItem(this.DISMISSED_EVENTS_KEY, JSON.stringify([...new Set(slugs)]));
+    } catch {
+      // ignore storage errors
+    }
+  },
+
+  dismissEventBanner(slug) {
+    const dismissed = this.getDismissedEventSlugs();
+    dismissed.push(slug);
+    this.setDismissedEventSlugs(dismissed);
+    this.activeEventIndex = 0;
+    this.renderEventSpotlightBanner();
+    this.updateRestoreDismissedButton();
+    this.showToast('Event suggestion dismissed. You can restore it anytime in Events.', 'info');
+  },
+
+  restoreDismissedEvents() {
+    this.setDismissedEventSlugs([]);
+    this.activeEventIndex = 0;
+    this.renderEventSpotlightBanner();
+    this.updateRestoreDismissedButton();
+    this.showToast('Dismissed campus event banners restored.', 'success');
+  },
+
+  updateRestoreDismissedButton() {
+    const btn = document.getElementById('restoreDismissedEventsBtn');
+    if (btn) {
+      btn.style.display = this.getDismissedEventSlugs().length > 0 ? 'inline-flex' : 'none';
+    }
+  },
+
+  cycleApproachingEvent(delta) {
+    const visible = this.getVisibleApproachingEvents();
+    if (visible.length <= 1) return;
+    this.activeEventIndex = (this.activeEventIndex + delta + visible.length) % visible.length;
+    this.renderEventSpotlightBanner();
+  },
+
+  getVisibleApproachingEvents() {
+    const dismissed = new Set(this.getDismissedEventSlugs());
+    return (this.approachingEvents || []).filter((ev) => !dismissed.has(ev.slug));
+  },
+
+  async loadApproachingEventBanner() {
+    try {
+      this.approachingEvents = await Api.getApproachingEvents();
+      this.renderEventSpotlightBanner();
+    } catch {
+      // Non-blocking: banner stays hidden if no approaching events
+    }
+  },
+
+  renderEventSpotlightBanner() {
+    const banner = document.getElementById('eventSpotlightBanner');
+    if (!banner) return;
+
+    const visible = this.getVisibleApproachingEvents();
+    if (!visible.length) {
+      banner.style.display = 'none';
+      banner.innerHTML = '';
+      return;
+    }
+
+    if (this.activeEventIndex >= visible.length) {
+      this.activeEventIndex = 0;
+    }
+
+    const ev = visible[this.activeEventIndex];
+    const recs = (ev.recommendedListings || []).slice(0, 3);
+    const thumbSrc = this.safeImageUrl(ev.imageUrl, this.getFallbackImage(ev.relevantCategories?.[0] || 'Other'));
+
+    const recButtonsHtml = recs
+      .map(
+        (item) => `
+          <button type="button" class="chip bg-yellow" style="cursor:pointer;" onclick="App.openListingDetail(${Number(item.id)})">
+            ${this.escapeHtml(CATEGORY_EMOJI[item.category] || '🎒')} ${this.escapeHtml(item.itemName.slice(0, 26))}${item.itemName.length > 26 ? '…' : ''}
+          </button>
+        `
+      )
+      .join('');
+
+    banner.style.display = 'flex';
+    banner.innerHTML = `
+      <div class="event-spotlight-left">
+        <img src="${this.escapeHtml(thumbSrc)}" alt="${this.escapeHtml(ev.eventName)}" class="event-spotlight-thumb" onerror="this.style.display='none'">
+        <div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
+            <span class="tag bg-yellow">${this.escapeHtml(ev.countdownLabel)}</span>
+            <span style="font-family:var(--font-mono); font-size:0.72rem; font-weight:700; text-transform:uppercase;">
+              ${this.escapeHtml(ev.eventName)} · ${this.escapeHtml(ev.eventDate)}
+            </span>
+          </div>
+          <p style="font-size:0.95rem; font-weight:700; margin-bottom:8px;">
+            ${this.escapeHtml(ev.bannerMessage)}
+          </p>
+          ${recButtonsHtml ? `<div style="display:flex; gap:6px; flex-wrap:wrap;">${recButtonsHtml}</div>` : ''}
+        </div>
+      </div>
+
+      <div class="event-spotlight-actions">
+        ${
+          visible.length > 1
+            ? `<button type="button" class="btn btn-secondary btn-sm" title="Next approaching event" onclick="App.cycleApproachingEvent(1)">
+                 Next (${this.activeEventIndex + 1}/${visible.length})
+               </button>`
+            : ''
+        }
+        <button type="button" class="btn btn-primary btn-sm" onclick="App.exploreEventRecommendations(${Number(ev.id)})">
+          <i data-lucide="calendar" style="width:14px;height:14px;"></i> Explore Items (${Number(ev.matchingCount || 0)})
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" aria-label="Dismiss event suggestion" onclick="App.dismissEventBanner('${this.escapeHtml(ev.slug)}')">
+          × Dismiss
+        </button>
+      </div>
+    `;
+
+    if (window.lucide) window.lucide.createIcons();
+  },
+
+  exploreEventRecommendations(eventId) {
+    this.selectedEventId = eventId;
+    this.switchView('events');
+  },
+
+  async loadEventsView() {
+    const timelineGrid = document.getElementById('eventsTimelineGrid');
+    if (!timelineGrid) return;
+
+    this.updateRestoreDismissedButton();
+
+    try {
+      timelineGrid.innerHTML =
+        '<div class="empty-state" style="grid-column:1/-1; margin:0;"><div class="empty-state-icon">📅</div><h3 class="empty-state-title">Loading Campus Calendar...</h3></div>';
+
+      const events = await Api.getCampusEvents();
+      this.allEvents = events || [];
+
+      if (!this.allEvents.length) {
+        timelineGrid.innerHTML =
+          '<div class="empty-state" style="grid-column:1/-1; margin:0;"><div class="empty-state-icon">📅</div><h3 class="empty-state-title">No Configured Campus Events</h3><p class="empty-state-desc">Configured campus events will appear here with matching listings.</p></div>';
+        return;
+      }
+
+      if (!this.selectedEventId || !this.allEvents.some((e) => Number(e.id) === Number(this.selectedEventId))) {
+        const firstApproaching = this.allEvents.find((e) => e.isApproaching);
+        this.selectedEventId = firstApproaching ? firstApproaching.id : this.allEvents[0].id;
+      }
+
+      this.renderEventsTimeline();
+      const selected = this.allEvents.find((e) => Number(e.id) === Number(this.selectedEventId));
+      if (selected) {
+        this.renderEventRecommendations(selected);
+      }
+    } catch (err) {
+      this.showToast(err.message, 'error');
+    }
+  },
+
+  selectEvent(eventId) {
+    this.selectedEventId = eventId;
+    this.renderEventsTimeline();
+    const selected = this.allEvents.find((e) => Number(e.id) === Number(eventId));
+    if (selected) {
+      this.renderEventRecommendations(selected);
+      document.getElementById('eventRecsSection')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  },
+
+  renderEventsTimeline() {
+    const timelineGrid = document.getElementById('eventsTimelineGrid');
+    if (!timelineGrid) return;
+
+    timelineGrid.innerHTML = this.allEvents
+      .map((ev) => {
+        const isActive = Number(ev.id) === Number(this.selectedEventId);
+        const headBg = ev.isApproaching ? 'bg-yellow' : ev.isPast ? 'bg-peach' : 'bg-mint';
+        const statusLabel = ev.isApproaching ? 'Approaching' : ev.isPast ? 'Past' : 'Upcoming';
+        const catsHtml = (ev.relevantCategories || [])
+          .map((cat) => `<span class="tag">${this.escapeHtml(cat)}</span>`)
+          .join('');
+        const safeImg = this.safeImageUrl(ev.imageUrl, '');
+
+        return `
+          <article class="event-card ${isActive ? 'active' : ''}">
+            <div class="event-card-head ${headBg}">
+              <span>${this.escapeHtml(ev.countdownLabel)} · ${this.escapeHtml(ev.eventDate)}</span>
+              <span class="tag" style="background:#FFFFFF;">${statusLabel}</span>
+            </div>
+            ${safeImg ? `<img src="${this.escapeHtml(safeImg)}" alt="${this.escapeHtml(ev.eventName)}" class="event-card-img">` : ''}
+            <div class="event-card-body">
+              <h3 style="font-size:1.1rem; font-weight:800;">${this.escapeHtml(ev.eventName)}</h3>
+              <p style="font-size:0.86rem; color:var(--ink-muted); line-height:1.45;">${this.escapeHtml(ev.description)}</p>
+              <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
+                ${catsHtml}
+              </div>
+              <div style="margin-top:auto; padding-top:10px; display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                <span style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700;">
+                  ${Number(ev.matchingCount || 0)} matching items
+                </span>
+                <button type="button" class="btn ${isActive ? 'btn-primary' : 'btn-yellow'} btn-sm" onclick="App.selectEvent(${Number(ev.id)})">
+                  ${isActive ? 'Selected' : 'View Items'}
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      })
+      .join('');
+  },
+
+  renderEventRecommendations(ev) {
+    const section = document.getElementById('eventRecsSection');
+    const heading = document.getElementById('eventRecsHeading');
+    const countTag = document.getElementById('eventRecsCountTag');
+    const subtext = document.getElementById('eventRecsSubtext');
+    const grid = document.getElementById('eventRecsGrid');
+    if (!section || !grid) return;
+
+    const recs = ev.recommendedListings || [];
+    section.style.display = 'block';
+    if (heading) heading.innerText = `Recommended for ${ev.eventName}`;
+    if (countTag) countTag.innerText = `${recs.length} Match${recs.length === 1 ? '' : 'es'}`;
+    if (subtext) subtext.innerText = `${ev.bannerMessage} (${ev.eventDate} · ${ev.countdownLabel})`;
+
+    if (!recs.length) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1; margin:0;">
+          <div class="empty-state-icon">✨</div>
+          <h3 class="empty-state-title">No Matching Items Listed Yet</h3>
+          <p class="empty-state-desc">Have relevant gear for ${this.escapeHtml(ev.eventName)}? List it for fellow students.</p>
+          <button type="button" class="btn btn-yellow btn-sm" onclick="App.switchView('sell')">List an Item</button>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = recs
+      .map((item) => {
+        const type = (item.transactionType || 'SELL').toUpperCase();
+        const fallbackImg = this.getFallbackImage(item.category);
+        const seller = item.sellerProfile || { handle: 'Campus_Peer', avatarEmoji: '🐼', isVerified: false };
+        return `
+          <article class="listing-card card-interactive">
+            <div class="listing-card-top type-${this.escapeHtml(type)}" onclick="App.openListingDetail(${Number(item.id)})">
+              <span class="listing-top-mode">${this.escapeHtml(this.getCardModeLabel(item))}</span>
+              <span class="listing-dept-tag">${this.escapeHtml(this.getDeptAgeTag(item))}</span>
+            </div>
+            <div class="listing-thumb-container" style="cursor:pointer;" onclick="App.openListingDetail(${Number(item.id)})">
+              <img
+                src="${this.escapeHtml(this.safeImageUrl(item.imageUrl, fallbackImg))}"
+                alt="${this.escapeHtml(item.itemName)}"
+                class="listing-thumb"
+                loading="lazy"
+                onerror="this.onerror=null;this.src='${fallbackImg}';"
+              >
+              ${this.getConditionBadgeHtml(item.condition)}
+            </div>
+            <div class="listing-body">
+              <div class="event-reason-pill">✨ ${this.escapeHtml(item.matchReason || `Useful for ${ev.eventName}`)}</div>
+              <h3 class="listing-title" style="cursor:pointer;" onclick="App.openListingDetail(${Number(item.id)})">
+                ${this.escapeHtml(item.itemName)}
+              </h3>
+              ${this.getLocationRowHtml(item)}
+              <div class="listing-bottom-bar">
+                ${this.renderCardFooterPriceHtml(item)}
+                <div class="listing-seller-cluster">
+                  <span class="seller-handle-btn" style="cursor:default;">
+                    <span>${this.escapeHtml(seller.avatarEmoji || '🐼')}</span>
+                    <span>${this.escapeHtml(seller.handle)}</span>
+                  </span>
+                  <button type="button" class="card-arrow-btn" title="View Listing Details" onclick="App.openListingDetail(${Number(item.id)})">
+                    <i data-lucide="arrow-right" style="width:15px;height:15px;"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </article>
+        `;
+      })
+      .join('');
+
+    if (window.lucide) window.lucide.createIcons();
+  },
+
+  // ------------------------------------------------------------------------
+  // PROFILE, TRUST BADGES, CAMPUS VERIFICATION, EXCHANGES & RATINGS
+  // ------------------------------------------------------------------------
+  inspectPeerProfile(userId) {
+    this.viewedProfileUserId = userId;
+    this.switchView('profile');
+  },
+
+  async loadProfileView(targetUserId = null) {
+    const dirEl = document.getElementById('profilePeerDirectory');
+    const mountEl = document.getElementById('profileOverviewMount');
+    const txSection = document.getElementById('myTransactionsSection');
+    const txBody = document.getElementById('myTransactionsBody');
+    const txCountTag = document.getElementById('myTransactionsCountTag');
+    const ratingsHeading = document.getElementById('ratingsReceivedHeading');
+    const ratingsCountTag = document.getElementById('ratingsReceivedCountTag');
+    const ratingsBody = document.getElementById('ratingsReceivedBody');
+
+    if (!mountEl) return;
+
+    const resolvedTargetId = targetUserId || this.currentUser?.id;
+    this.viewedProfileUserId = resolvedTargetId || null;
+
+    if (!resolvedTargetId) {
+      mountEl.innerHTML = '<div class="empty-state"><p>Sign in with a demo persona to view your profile.</p></div>';
+      return;
+    }
+
+    const isOwnProfile = this.currentUser && Number(resolvedTargetId) === Number(this.currentUser.id);
+
+    // Build peer directory pills
+    if (dirEl) {
+      const peerMap = new Map();
+      if (this.currentUser) peerMap.set(Number(this.currentUser.id), this.currentUser);
+      (this.personas || []).forEach((p) => {
+        if (!peerMap.has(Number(p.id))) peerMap.set(Number(p.id), p);
+      });
+
+      dirEl.innerHTML = [...peerMap.values()]
+        .slice(0, 10)
+        .map((p) => {
+          const active = Number(p.id) === Number(resolvedTargetId);
+          return `
+            <button type="button" class="peer-pill-btn ${active ? 'active' : ''}" onclick="App.loadProfileView(${Number(p.id)})">
+              <span>${this.escapeHtml(p.avatarEmoji || '🐼')}</span>
+              <span>${this.escapeHtml(p.handle)}</span>
+              ${p.isVerified ? '<span>✅</span>' : ''}
+            </button>
+          `;
+        })
+        .join('');
+    }
+
+    try {
+      mountEl.innerHTML = '<div class="empty-state" style="margin:0;"><h3 class="empty-state-title">Loading Profile &amp; Badges...</h3></div>';
+      const profileRes = await Api.getPublicUserProfile(resolvedTargetId);
+      const user = profileRes.user;
+      const trust = user.trust || {
+        isVerified: Boolean(user.isVerified),
+        completedCount: 0,
+        completedSwaps: 0,
+        completedLends: 0,
+        ratingCount: 0,
+        averageRating: null,
+        badges: []
+      };
+      const ratings = profileRes.ratings || [];
+
+      const avgDisplay =
+        trust.ratingCount > 0 && trust.averageRating !== null
+          ? `★ ${trust.averageRating} (${trust.ratingCount})`
+          : 'No ratings yet';
+
+      const badgesHtml = (trust.badges || []).length
+        ? `<div class="badges-grid">
+             ${trust.badges
+               .map(
+                 (b) => `
+                   <div class="trust-badge-card bg-${this.escapeHtml(b.tone || 'mint')}">
+                     <div class="trust-badge-emoji">${this.escapeHtml(b.emoji)}</div>
+                     <div>
+                       <strong style="display:block; font-size:0.94rem;">${this.escapeHtml(b.label)}</strong>
+                       <span style="font-size:0.78rem; color:var(--ink-muted); line-height:1.35; display:block; margin-top:2px;">
+                         ${this.escapeHtml(b.reason)}
+                       </span>
+                     </div>
+                   </div>
+                 `
+               )
+               .join('')}
+           </div>`
+        : `<div class="pricing-explanation-box" style="margin-top:0;">
+             No badges earned yet. Badges unlock automatically from verified campus status, completed exchanges, lends, swaps, and peer ratings.
+           </div>`;
+
+      const verifyBlockHtml =
+        isOwnProfile && !user.isVerified
+          ? `
+            <form id="verifyCampusForm" style="margin-top:14px; padding-top:14px; border-top:2px dashed rgba(17,17,17,0.2);">
+              <label class="form-label" for="verifyCampusInput">
+                <span>Verify Campus Student Status</span>
+                <span class="form-label-hint">Roll ID (e.g. CS2024042) or .edu / .ac.in email</span>
+              </label>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="text" id="verifyCampusInput" class="form-control" style="flex:1; min-width:210px;" placeholder="e.g. CS2024042 or panda27@iit.ac.in" required>
+                <button type="submit" class="btn btn-teal btn-sm">
+                  <i data-lucide="shield-check" style="width:15px;height:15px;"></i> Verify Now
+                </button>
+              </div>
+            </form>
+          `
+          : '';
+
+      mountEl.innerHTML = `
+        <div class="detail-grid-2" style="margin-bottom:0;">
+          <div class="numbered-section" style="margin-bottom:0;">
+            <div class="numbered-section-head bg-yellow">
+              <div class="numbered-section-title">
+                <span class="num-pill">1</span>
+                <span>${isOwnProfile ? 'My Campus Identity' : 'Student Profile'}</span>
+              </div>
+              <span class="tag ${trust.isVerified ? 'bg-mint' : ''}">
+                ${trust.isVerified ? '✅ Campus Verified' : 'Unverified Demo'}
+              </span>
+            </div>
+            <div class="numbered-section-body">
+              <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+                <div class="wanted-emoji-avatar" style="width:56px; height:56px; font-size:1.7rem; background:var(--yellow);">
+                  ${this.escapeHtml(user.avatarEmoji || '🐼')}
+                </div>
+                <div>
+                  <h3 style="font-size:1.3rem; font-weight:800;">${this.escapeHtml(user.handle)}</h3>
+                  <p style="font-size:0.86rem; color:var(--ink-muted);">${this.escapeHtml(user.department || 'Campus Student (Demo)')}</p>
+                </div>
+              </div>
+
+              <div class="trust-stats-strip">
+                <div class="trust-stat-box">
+                  <strong>${Number(trust.completedCount || 0)}</strong>
+                  <span>Completed</span>
+                </div>
+                <div class="trust-stat-box">
+                  <strong>${trust.ratingCount > 0 && trust.averageRating !== null ? `★ ${trust.averageRating}` : '—'}</strong>
+                  <span>Avg (${Number(trust.ratingCount || 0)})</span>
+                </div>
+                <div class="trust-stat-box">
+                  <strong>${Number(trust.completedSwaps || 0)}</strong>
+                  <span>Swaps</span>
+                </div>
+                <div class="trust-stat-box">
+                  <strong>${Number(trust.completedLends || 0)}</strong>
+                  <span>Lends</span>
+                </div>
+              </div>
+
+              <div style="font-size:0.82rem; color:var(--ink-muted);">
+                Rating Summary: <strong>${this.escapeHtml(avgDisplay)}</strong>
+              </div>
+              ${verifyBlockHtml}
+            </div>
+          </div>
+
+          <div class="numbered-section" style="margin-bottom:0;">
+            <div class="numbered-section-head bg-purple">
+              <div class="numbered-section-title">
+                <span class="num-pill">2</span>
+                <span>Earned Trust Badges</span>
+              </div>
+              <span class="tag" style="color:#111111;">${(trust.badges || []).length} Earned</span>
+            </div>
+            <div class="numbered-section-body">
+              ${badgesHtml}
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('verifyCampusForm')?.addEventListener('submit', (e) => {
+        this.submitCampusVerification(e);
+      });
+
+      // Load My Exchanges & Post-Completion Ratings when viewing own profile
+      if (txSection && txBody) {
+        if (isOwnProfile) {
+          txSection.style.display = 'block';
+          const txs = await Api.getMyTransactions();
+          this.myTransactions = txs || [];
+          if (txCountTag) txCountTag.innerText = `${this.myTransactions.length} Exchange${this.myTransactions.length === 1 ? '' : 's'}`;
+
+          if (!this.myTransactions.length) {
+            txBody.innerHTML =
+              '<p style="font-size:0.9rem; color:var(--ink-muted);">No active or completed exchanges yet. Request any listing in Marketplace to start a campus handover.</p>';
+          } else {
+            txBody.innerHTML = this.myTransactions
+              .map((tx) => {
+                const roleLabel = tx.isSeller ? 'Owner / Seller' : 'Buyer / Requester';
+                const peer = tx.peerProfile || { id: 0, handle: 'Campus_Peer', avatarEmoji: '🐼' };
+                const statusTone =
+                  tx.status === 'COMPLETED'
+                    ? 'bg-teal'
+                    : tx.status === 'ACCEPTED'
+                      ? 'bg-yellow'
+                      : tx.status === 'CANCELLED'
+                        ? 'bg-coral'
+                        : 'bg-mint';
+
+                let detailStr = '';
+                if (tx.transactionType === 'SELL' && tx.proposedPrice) {
+                  detailStr = `Offer: ₹${Number(tx.proposedPrice).toLocaleString('en-IN')}`;
+                } else if (tx.transactionType === 'SWAP' && tx.swapOffer) {
+                  detailStr = `Swap Offer: ${tx.swapOffer}`;
+                } else if ((tx.transactionType === 'BORROW' || tx.transactionType === 'RENT') && (tx.startDate || tx.endDate)) {
+                  detailStr = `Dates: ${tx.startDate || 'TBD'} → ${tx.endDate || 'TBD'}`;
+                }
+
+                const userConfirmed = tx.isBuyer ? tx.buyerConfirmed : tx.sellerConfirmed;
+                const peerConfirmed = tx.isBuyer ? tx.sellerConfirmed : tx.buyerConfirmed;
+
+                let actionsHtml = '';
+                if (tx.status === 'REQUESTED') {
+                  if (tx.isSeller) {
+                    actionsHtml += `<button type="button" class="btn btn-teal btn-sm" onclick="App.handleTransactionAction(${Number(tx.id)}, 'ACCEPT')">Accept Request</button>`;
+                  }
+                  actionsHtml += `<button type="button" class="btn btn-secondary btn-sm" onclick="App.handleTransactionAction(${Number(tx.id)}, 'CANCEL')">Cancel</button>`;
+                } else if (tx.status === 'ACCEPTED') {
+                  if (!userConfirmed) {
+                    actionsHtml += `<button type="button" class="btn btn-yellow btn-sm" onclick="App.handleTransactionAction(${Number(tx.id)}, 'CONFIRM')">Confirm Handover</button>`;
+                  } else {
+                    actionsHtml += `<span class="tag bg-mint">${peerConfirmed ? 'Both Confirmed' : 'You Confirmed · Waiting Peer'}</span>`;
+                  }
+                  actionsHtml += `<button type="button" class="btn btn-secondary btn-sm" onclick="App.handleTransactionAction(${Number(tx.id)}, 'CANCEL')">Cancel</button>`;
+                } else if (tx.status === 'COMPLETED') {
+                  if (tx.hasRated) {
+                    actionsHtml += `<span class="tag bg-yellow">Rated ★ ${Number(tx.myRatingScore || 5)}/5</span>`;
+                  } else {
+                    actionsHtml += `<button type="button" class="btn btn-primary btn-sm" onclick="App.openRatingModal(${Number(tx.id)}, '${this.escapeHtml(tx.itemName)}', '${this.escapeHtml(peer.handle)}')">Rate Peer ★</button>`;
+                  }
+                }
+
+                return `
+                  <div class="tx-row-card">
+                    <div>
+                      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
+                        <span class="tag ${statusTone}">${this.escapeHtml(tx.status)}</span>
+                        <span class="tag">${this.escapeHtml(tx.transactionType)}</span>
+                        <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--ink-muted);">${roleLabel}</span>
+                      </div>
+                      <strong style="font-size:1rem; cursor:pointer; text-decoration:underline;" onclick="App.openListingDetail(${Number(tx.listingId)})">
+                        ${this.escapeHtml(tx.itemName)}
+                      </strong>
+                      <div style="font-size:0.84rem; color:var(--ink-muted); margin-top:3px;">
+                        With <button type="button" class="seller-handle-btn" style="padding:0;" onclick="App.inspectPeerProfile(${Number(peer.id)})">${this.escapeHtml(peer.avatarEmoji || '🐼')} ${this.escapeHtml(peer.handle)}</button>
+                        ${detailStr ? ` · ${this.escapeHtml(detailStr)}` : ''}
+                        ${tx.note ? ` · “${this.escapeHtml(tx.note)}”` : ''}
+                      </div>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                      ${actionsHtml}
+                    </div>
+                  </div>
+                `;
+              })
+              .join('');
+          }
+        } else {
+          txSection.style.display = 'none';
+        }
+      }
+
+      // Render ratings received feed
+      if (ratingsHeading) ratingsHeading.innerText = `Peer Ratings Received by ${user.handle}`;
+      if (ratingsCountTag) ratingsCountTag.innerText = `${ratings.length} Rating${ratings.length === 1 ? '' : 's'}`;
+      if (ratingsBody) {
+        if (!ratings.length) {
+          ratingsBody.innerHTML = '<p style="font-size:0.9rem; color:var(--ink-muted);">No completed exchange ratings received yet.</p>';
+        } else {
+          ratingsBody.innerHTML = ratings
+            .map(
+              (r) => `
+                <div class="rating-item-card">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <span class="tag bg-yellow">${'★'.repeat(Number(r.score || 5))} (${Number(r.score || 5)}/5)</span>
+                      <strong>${this.escapeHtml(r.raterEmoji || '🐼')} ${this.escapeHtml(r.raterHandle)}</strong>
+                    </div>
+                    <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--ink-muted);">
+                      ${this.escapeHtml(r.transactionType)} · ${this.escapeHtml(r.itemName)}
+                    </span>
+                  </div>
+                  ${r.feedback ? `<p style="font-size:0.88rem; line-height:1.45;">“${this.escapeHtml(r.feedback)}”</p>` : '<p style="font-size:0.82rem; color:var(--ink-muted);">Completed campus handover rated.</p>'}
+                </div>
+              `
+            )
+            .join('');
+        }
+      }
+
+      if (window.lucide) window.lucide.createIcons();
+    } catch (err) {
+      this.showToast(err.message, 'error');
+    }
+  },
+
+  async submitCampusVerification(e) {
+    e.preventDefault();
+    const input = document.getElementById('verifyCampusInput');
+    const credential = input?.value.trim() || '';
+    if (!credential) {
+      this.showToast('Please enter a campus roll ID or .edu/.ac.in email.', 'error');
+      return;
+    }
+
+    try {
+      const updatedUser = await Api.verifyCampus(credential);
+      this.setCurrentUser(updatedUser);
+      const personasRes = await Api.getPersonas();
+      this.personas = personasRes.data || this.personas;
+      await Promise.all([this.loadProfileView(updatedUser.id), this.loadMarketplace()]);
+      this.showToast('Campus Verified badge unlocked!', 'success');
+    } catch (err) {
+      this.showToast(err.message, 'error');
+    }
+  },
+
+  async handleTransactionAction(txId, action) {
+    try {
+      const updated = await Api.updateTransactionStatus(txId, action);
+      if (updated.status === 'COMPLETED') {
+        this.showToast('Exchange marked COMPLETED! You can now rate your campus peer.', 'success');
+      } else if (action === 'ACCEPT') {
+        this.showToast('Request accepted! Confirm handover once you meet on campus.', 'success');
+      } else if (action === 'CONFIRM') {
+        this.showToast('Handover confirmed! Waiting for the other student to confirm.', 'info');
+      } else {
+        this.showToast('Transaction updated.', 'info');
+      }
+      await Promise.all([this.loadProfileView(this.viewedProfileUserId), this.loadMarketplace()]);
+    } catch (err) {
+      this.showToast(err.message, 'error');
+    }
+  },
+
+  openRatingModal(txId, itemName, peerHandle) {
+    const txInput = document.getElementById('ratingTransactionId');
+    const summaryEl = document.getElementById('ratingTargetSummary');
+    const scoreInput = document.getElementById('ratingScoreInput');
+    const feedbackInput = document.getElementById('ratingFeedbackInput');
+
+    if (txInput) txInput.value = String(txId);
+    if (summaryEl) {
+      summaryEl.innerHTML = `<span>⭐ Rating <strong>${this.escapeHtml(peerHandle)}</strong> for completed exchange: <strong>${this.escapeHtml(itemName)}</strong></span>`;
+    }
+    if (scoreInput) scoreInput.value = '5';
+    if (feedbackInput) feedbackInput.value = '';
+    document.querySelectorAll('#starPickerRow .star-choice').forEach((btn) => btn.classList.add('active'));
+    this.openModal('ratingModal');
+  },
+
+  bindRatingModal() {
+    const starRow = document.getElementById('starPickerRow');
+    const scoreInput = document.getElementById('ratingScoreInput');
+    const form = document.getElementById('submitRatingForm');
+
+    starRow?.querySelectorAll('.star-choice').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const chosen = parseInt(btn.getAttribute('data-score'), 10) || 5;
+        if (scoreInput) scoreInput.value = String(chosen);
+        starRow.querySelectorAll('.star-choice').forEach((b) => {
+          const val = parseInt(b.getAttribute('data-score'), 10) || 0;
+          b.classList.toggle('active', val <= chosen);
+        });
+      });
+    });
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const transactionId = parseInt(document.getElementById('ratingTransactionId')?.value || '0', 10);
+      const score = parseInt(scoreInput?.value || '5', 10);
+      const feedback = document.getElementById('ratingFeedbackInput')?.value.trim() || '';
+
+      try {
+        await Api.submitRating({ transactionId, score, feedback });
+        this.closeModal('ratingModal');
+        this.showToast('Peer rating submitted! Trust badges updated.', 'success');
+        await Promise.all([this.loadProfileView(this.viewedProfileUserId), this.loadMarketplace()]);
+      } catch (err) {
+        this.showToast(err.message, 'error');
+      }
+    });
+  },
+
+  // ------------------------------------------------------------------------
   // Utilities
   // ------------------------------------------------------------------------
+  safeImageUrl(url, fallback = '') {
+    if (!url || typeof url !== 'string') return fallback;
+    const trimmed = url.trim();
+    if (/^https?:\/\//i.test(trimmed) || /^data:image\/svg\+xml/i.test(trimmed)) {
+      return trimmed;
+    }
+    return fallback;
+  },
+
   showToast(message, type = 'success') {
     const container = document.getElementById('toastContainer');
     if (!container) return;

@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 const { getDb } = require('../config/db');
 const { buildLittleLoop } = require('../services/mascotService');
+const { getUserTrustSummary, getUserTrustMap } = require('../services/trustService');
 
 const CATEGORY_THUMBNAILS = {
   Calculators:
@@ -41,8 +42,9 @@ const CATEGORY_THUMBNAILS = {
 };
 
 function resolveImageUrl(category, imageUrl) {
-  if (imageUrl && String(imageUrl).trim()) {
-    return String(imageUrl).trim();
+  const cleaned = imageUrl ? String(imageUrl).trim() : '';
+  if (cleaned && (/^https?:\/\//i.test(cleaned) || /^data:image\//i.test(cleaned))) {
+    return cleaned;
   }
   return CATEGORY_THUMBNAILS[category] || CATEGORY_THUMBNAILS.Other;
 }
@@ -80,7 +82,7 @@ const SELECT_LISTING_COLUMNS = `
   u.is_verified AS userIsVerified
 `;
 
-function mapListingRow(row) {
+function mapListingRow(row, trustSummary = null) {
   if (!row) return null;
   const transactionType = String(row.transactionType || 'SELL').toUpperCase();
   const sellerHandle = row.userHandle || row.sellerName || 'Campus_Senior';
@@ -120,6 +122,7 @@ function mapListingRow(row) {
       isDemo: row.userIsDemo !== undefined ? Boolean(row.userIsDemo) : true,
       isVerified: Boolean(row.userIsVerified)
     },
+    sellerTrust: trustSummary || null,
     imageUrl: resolveImageUrl(row.category, row.imageUrl),
     createdAt: row.createdAt
   };
@@ -140,10 +143,15 @@ function getAllListings(req, res, next) {
       )
       .all();
 
+    const trustMap = getUserTrustMap(
+      db,
+      rows.map((r) => r.sellerId)
+    );
+
     return res.json({
       success: true,
       count: rows.length,
-      data: rows.map(mapListingRow)
+      data: rows.map((r) => mapListingRow(r, r.sellerId ? trustMap.get(r.sellerId) : null))
     });
   } catch (err) {
     return next(err);
@@ -195,10 +203,15 @@ function searchListings(req, res, next) {
       )
       .all(...params);
 
+    const trustMap = getUserTrustMap(
+      db,
+      rows.map((r) => r.sellerId)
+    );
+
     return res.json({
       success: true,
       count: rows.length,
-      data: rows.map(mapListingRow)
+      data: rows.map((r) => mapListingRow(r, r.sellerId ? trustMap.get(r.sellerId) : null))
     });
   } catch (err) {
     return next(err);
@@ -226,9 +239,11 @@ function getListingById(req, res, next) {
       return res.status(404).json({ success: false, message: 'Listing not found' });
     }
 
+    const sellerTrust = row.sellerId ? getUserTrustSummary(db, row.sellerId) : null;
+
     return res.json({
       success: true,
-      data: mapListingRow(row)
+      data: mapListingRow(row, sellerTrust)
     });
   } catch (err) {
     return next(err);
@@ -340,6 +355,9 @@ function createListing(req, res, next) {
       ? `${resolvedUser.handle} ${resolvedUser.avatarEmoji}`
       : (body.sellerName && String(body.sellerName).trim()) || 'Campus_Senior 🎓';
 
+    const rawImg = body.imageUrl ? String(body.imageUrl).trim() : '';
+    const safeImg = /^https?:\/\//i.test(rawImg) ? rawImg : '';
+
     const insertResult = db
       .prepare(
         `INSERT INTO listings (
@@ -375,7 +393,7 @@ function createListing(req, res, next) {
         body.description ? String(body.description).trim() : '',
         sellerDisplay,
         resolvedUser ? `${resolvedUser.handle.toLowerCase()}@campus.example` : 'senior@campus.example',
-        body.imageUrl ? String(body.imageUrl).trim() : ''
+        safeImg
       );
 
     const created = db
@@ -387,9 +405,11 @@ function createListing(req, res, next) {
       )
       .get(insertResult.lastInsertRowid);
 
+    const sellerTrust = created?.sellerId ? getUserTrustSummary(db, created.sellerId) : null;
+
     return res.status(201).json({
       success: true,
-      data: mapListingRow(created)
+      data: mapListingRow(created, sellerTrust)
     });
   } catch (err) {
     return next(err);

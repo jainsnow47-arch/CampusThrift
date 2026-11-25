@@ -1,4 +1,4 @@
--- ReLoop Campus Circular Marketplace - Phase 1 SQLite Schema
+-- Campus Thrift Circular Marketplace - SQLite Schema
 
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   department TEXT NOT NULL DEFAULT 'Campus Student',
   is_demo INTEGER NOT NULL DEFAULT 1,
   is_verified INTEGER NOT NULL DEFAULT 0,
+  campus_verified_roll TEXT DEFAULT '',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -84,3 +85,62 @@ CREATE TABLE IF NOT EXISTS wanted_requests (
 );
 
 CREATE INDEX IF NOT EXISTS idx_wanted_category ON wanted_requests(category);
+
+CREATE TABLE IF NOT EXISTS transactions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  listing_id INTEGER NOT NULL,
+  buyer_id INTEGER NOT NULL,
+  seller_id INTEGER NOT NULL,
+  transaction_type TEXT NOT NULL CHECK (transaction_type IN ('SELL', 'SWAP', 'BORROW', 'RENT')),
+  status TEXT NOT NULL DEFAULT 'REQUESTED' CHECK (status IN ('REQUESTED', 'ACCEPTED', 'COMPLETED', 'CANCELLED')),
+  proposed_price REAL CHECK (proposed_price IS NULL OR proposed_price >= 0),
+  swap_offer TEXT DEFAULT '',
+  start_date TEXT DEFAULT '',
+  end_date TEXT DEFAULT '',
+  note TEXT DEFAULT '',
+  buyer_confirmed INTEGER NOT NULL DEFAULT 0,
+  seller_confirmed INTEGER NOT NULL DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  completed_at DATETIME,
+  FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE,
+  FOREIGN KEY (buyer_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_tx_listing ON transactions(listing_id);
+CREATE INDEX IF NOT EXISTS idx_tx_buyer ON transactions(buyer_id);
+CREATE INDEX IF NOT EXISTS idx_tx_seller ON transactions(seller_id);
+CREATE INDEX IF NOT EXISTS idx_tx_status ON transactions(status);
+
+CREATE TABLE IF NOT EXISTS ratings (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  transaction_id INTEGER NOT NULL,
+  rater_id INTEGER NOT NULL,
+  ratee_id INTEGER NOT NULL,
+  score INTEGER NOT NULL CHECK (score >= 1 AND score <= 5),
+  feedback TEXT DEFAULT '',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(transaction_id, rater_id),
+  FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE,
+  FOREIGN KEY (rater_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (ratee_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_ratings_ratee ON ratings(ratee_id);
+CREATE INDEX IF NOT EXISTS idx_ratings_tx ON ratings(transaction_id);
+
+CREATE TABLE IF NOT EXISTS campus_events (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  slug TEXT NOT NULL UNIQUE,
+  event_name TEXT NOT NULL,
+  event_date TEXT NOT NULL,
+  description TEXT NOT NULL,
+  banner_message TEXT NOT NULL,
+  relevant_categories TEXT NOT NULL DEFAULT '[]',
+  keywords TEXT NOT NULL DEFAULT '[]',
+  image_url TEXT DEFAULT '',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_events_date ON campus_events(event_date);
+

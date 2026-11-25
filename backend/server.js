@@ -12,6 +12,9 @@ const listingRoutes = require('./routes/listingRoutes');
 const pricingRoutes = require('./routes/pricingRoutes');
 const wantedRoutes = require('./routes/wantedRoutes');
 const authRoutes = require('./routes/authRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
+const ratingRoutes = require('./routes/ratingRoutes');
+const eventRoutes = require('./routes/eventRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -47,6 +50,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/listings', listingRoutes);
 app.use('/api/pricing', pricingRoutes);
 app.use('/api/wanted', wantedRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/ratings', ratingRoutes);
+app.use('/api/events', eventRoutes);
 
 // Fallback route for SPA / Direct browser navigation
 app.get('*', (req, res) => {

@@ -105,6 +105,12 @@ function ensureUnifiedListingColumns(db) {
 
   db.exec('CREATE INDEX IF NOT EXISTS idx_listings_type ON listings(transaction_type)');
   db.exec('CREATE INDEX IF NOT EXISTS idx_listings_seller ON listings(seller_id)');
+
+  // Safely migrate users table for campus verification roll/domain field
+  const userCols = db.prepare('PRAGMA table_info(users)').all().map((c) => c.name);
+  if (!userCols.includes('campus_verified_roll')) {
+    db.exec("ALTER TABLE users ADD COLUMN campus_verified_roll TEXT DEFAULT ''");
+  }
 }
 
 function initDatabase() {

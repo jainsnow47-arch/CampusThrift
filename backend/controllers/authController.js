@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { validationResult } = require('express-validator');
 const { getDb } = require('../config/db');
+const { getUserTrustSummary, getUserTrustMap, getRatingsForUser } = require('../services/trustService');
 
 const ALLOWED_EMOJIS = ['🐼', '🍡', '🦊', '🐨', '🦦', '🍁', '🦉', '🐝', '🐢', '🌵', '🚀', '🎨'];
 const RANDOM_ADJECTIVES = ['Pixel', 'Mochi', 'Maple', 'Solar', 'Comet', 'Boba', 'Sprout', 'Velvet'];
@@ -17,8 +18,8 @@ function issueSessionToken(db, userId) {
   return token;
 }
 
-function formatUser(row) {
-  return {
+function formatUser(row, trust = null) {
+  const out = {
     id: row.id,
     handle: row.handle,
     avatarEmoji: row.avatarEmoji,
@@ -26,6 +27,8 @@ function formatUser(row) {
     isDemo: Boolean(row.isDemo),
     isVerified: Boolean(row.isVerified)
   };
+  if (trust) out.trust = trust;
+  return out;
 }
 
 function listDemoPersonas(req, res, next) {
@@ -40,10 +43,15 @@ function listDemoPersonas(req, res, next) {
       )
       .all();
 
+    const trustMap = getUserTrustMap(
+      db,
+      rows.map((r) => r.id)
+    );
+
     return res.json({
       success: true,
       allowedEmojis: ALLOWED_EMOJIS,
-      data: rows.map(formatUser)
+      data: rows.map((r) => formatUser(r, trustMap.get(r.id)))
     });
   } catch (err) {
     return next(err);
@@ -102,11 +110,88 @@ function demoLogin(req, res, next) {
   }
 }
 
-function getCurrentUser(req, res) {
-  return res.json({
-    success: true,
-    user: req.user
-  });
+function getCurrentUser(req, res, next) {
+  try {
+    const db = getDb();
+    const trust = getUserTrustSummary(db, req.user.id);
+    return res.json({
+      success: true,
+      user: {
+        ...req.user,
+        trust
+      }
+    });
+  } catch (err) {
+    return next(err);
+  }
+}
+
+function getPublicUserProfile(req, res, next) {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    if (Number.isNaN(userId) || userId <= 0) {
+      return res.status(400).json({ success: false, message: 'Invalid user ID' });
+    }
+    const db = getDb();
+    const row = db
+      .prepare(
+        `SELECT id, handle, avatar_emoji AS avatarEmoji, department, is_demo AS isDemo, is_verified AS isVerified
+         FROM users WHERE id = ?`
+      )
+      .get(userId);
+    if (!row) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    const trust = getUserTrustSummary(db, userId);
+    const ratings = getRatingsForUser(db, userId);
+
+    return res.json({
+      success: true,
+      user: formatUser(row, trust),
+      ratings
+    });
+  } catch (err) {
+    return next(err);
+  }
+}
+
+function verifyCampusAccount(req, res, next) {
+  try {
+    const db = getDb();
+    const rawCode = String(req.body?.campusCredential || '').trim();
+    const rollRegex = /^[A-Za-z]{2,6}[-/]?\d{4,8}$/;
+    const eduEmailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(edu|ac\.in|campus\.example)$/i;
+
+    if (!rollRegex.test(rawCode) && !eduEmailRegex.test(rawCode)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Enter a valid campus roll ID (e.g. CS2024042) or campus email (.edu / .ac.in)'
+      });
+    }
+
+    db.prepare('UPDATE users SET is_verified = 1, campus_verified_roll = ? WHERE id = ?').run(
+      rawCode.slice(0, 60),
+      req.user.id
+    );
+
+    const updated = db
+      .prepare(
+        `SELECT id, handle, avatar_emoji AS avatarEmoji, department, is_demo AS isDemo, is_verified AS isVerified
+         FROM users WHERE id = ?`
+      )
+      .get(req.user.id);
+
+    const trust = getUserTrustSummary(db, req.user.id);
+
+    return res.json({
+      success: true,
+      message: 'Campus student verification completed!',
+      user: formatUser(updated, trust)
+    });
+  } catch (err) {
+    return next(err);
+  }
 }
 
 function updateProfile(req, res, next) {
@@ -182,6 +267,8 @@ module.exports = {
   listDemoPersonas,
   demoLogin,
   getCurrentUser,
+  getPublicUserProfile,
+  verifyCampusAccount,
   updateProfile,
   logout,
   ALLOWED_EMOJIS
