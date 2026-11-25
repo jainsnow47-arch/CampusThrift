@@ -1,11 +1,82 @@
 // ReLoop Frontend API Client
-// Connects to Express REST Backend
+// Connects to Express REST Backend with Server-Issued Demo Session Token
 
-const API_BASE_URL = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
-  ? `${window.location.origin}/api`
-  : '/api';
+const API_BASE_URL =
+  window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+    ? `${window.location.origin}/api`
+    : '/api';
+
+const TOKEN_KEY = 'reloop_session_token';
 
 const Api = {
+  getToken() {
+    try {
+      return localStorage.getItem(TOKEN_KEY) || '';
+    } catch {
+      return '';
+    }
+  },
+
+  setToken(token) {
+    try {
+      if (token) localStorage.setItem(TOKEN_KEY, token);
+      else localStorage.removeItem(TOKEN_KEY);
+    } catch {
+      // Ignore storage errors in restricted contexts
+    }
+  },
+
+  authHeaders(extra = {}) {
+    const token = this.getToken();
+    return token ? { ...extra, Authorization: `Bearer ${token}` } : { ...extra };
+  },
+
+  // 0. Auth & Pseudonymous Profile APIs
+  async getPersonas() {
+    const res = await fetch(`${API_BASE_URL}/auth/personas`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to load demo personas');
+    return data;
+  },
+
+  async demoLogin(handle = '') {
+    const res = await fetch(`${API_BASE_URL}/auth/demo-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(handle ? { handle } : {})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Demo login failed');
+    this.setToken(data.token);
+    return data.user;
+  },
+
+  async getCurrentUser() {
+    const token = this.getToken();
+    if (!token) return null;
+    const res = await fetch(`${API_BASE_URL}/auth/me`, {
+      headers: this.authHeaders()
+    });
+    if (res.status === 401) {
+      this.setToken('');
+      return null;
+    }
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to fetch current user');
+    return data.user;
+  },
+
+  async updateProfile(profileData) {
+    const res = await fetch(`${API_BASE_URL}/auth/profile`, {
+      method: 'PATCH',
+      headers: this.authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(profileData)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to update profile');
+    return data.user;
+  },
+
   // 1. Pricing Engine APIs
   async suggestPricing(itemData) {
     const res = await fetch(`${API_BASE_URL}/pricing/suggest`, {
@@ -40,10 +111,11 @@ const Api = {
     return data.data;
   },
 
-  async searchListings({ category, minPrice, maxPrice, condition, keyword } = {}) {
+  async searchListings({ category, condition, transactionType, minPrice, maxPrice, keyword } = {}) {
     const params = new URLSearchParams();
     if (category && category !== 'All') params.append('category', category);
     if (condition && condition !== 'All') params.append('condition', condition);
+    if (transactionType && transactionType !== 'All') params.append('transactionType', transactionType);
     if (minPrice) params.append('minPrice', minPrice);
     if (maxPrice) params.append('maxPrice', maxPrice);
     if (keyword && keyword.trim()) params.append('keyword', keyword.trim());
@@ -57,7 +129,7 @@ const Api = {
   async createListing(listingData) {
     const res = await fetch(`${API_BASE_URL}/listings`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(listingData)
     });
     const data = await res.json();
@@ -67,7 +139,8 @@ const Api = {
 
   async deleteListing(id) {
     const res = await fetch(`${API_BASE_URL}/listings/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: this.authHeaders()
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to delete listing');
@@ -85,7 +158,7 @@ const Api = {
   async createWanted(wantedData) {
     const res = await fetch(`${API_BASE_URL}/wanted`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(wantedData)
     });
     const data = await res.json();

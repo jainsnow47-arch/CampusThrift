@@ -117,7 +117,6 @@ const CONDITION_MULTIPLIERS = [
 ];
 
 function pickCondition(rng, index, category) {
-  // Ensure calculators have a well-balanced spread around Good/24 months for comparable queries
   if (category === 'Calculators') {
     const cycle = ['Good', 'Good', 'Excellent', 'Good', 'Fair', 'Like New', 'Good', 'Excellent', 'Fair', 'Poor'];
     return CONDITION_MULTIPLIERS.find((c) => c.grade === cycle[index % cycle.length]);
@@ -142,7 +141,6 @@ function buildHistoricalTransactions() {
 
       let ageInMonths;
       if (cat.category === 'Calculators' && i < 19) {
-        // Keep ~19 calculators within +/- 10 months of 24 months and Good/Excellent/Fair
         ageInMonths = 16 + (i % 15);
       } else {
         ageInMonths = 2 + Math.floor(rng() * 40);
@@ -172,8 +170,18 @@ function buildHistoricalTransactions() {
   return rows;
 }
 
+const DEMO_USERS = [
+  { handle: 'Panda_27', avatarEmoji: '🐼', department: 'ECE 3rd Yr (Demo)', isVerified: 1 },
+  { handle: 'Mochi_14', avatarEmoji: '🍡', department: 'CSE 4th Yr (Demo)', isVerified: 1 },
+  { handle: 'Pixel_Fox', avatarEmoji: '🦊', department: 'ME 4th Yr (Demo)', isVerified: 0 },
+  { handle: 'Koala_08', avatarEmoji: '🐨', department: 'EEE 3rd Yr (Demo)', isVerified: 1 },
+  { handle: 'Otter_91', avatarEmoji: '🦦', department: 'CE 2nd Yr (Demo)', isVerified: 0 },
+  { handle: 'Maple_42', avatarEmoji: '🍁', department: 'BT 1st Yr (Demo)', isVerified: 0 }
+];
+
 const DEFAULT_LISTINGS = [
   {
+    handle: 'Panda_27',
     itemName: 'Casio fx-991EX ClassWiz Scientific Calculator',
     category: 'Calculators',
     condition: 'Excellent',
@@ -181,12 +189,14 @@ const DEFAULT_LISTINGS = [
     originalPrice: 1350,
     suggestedPrice: 890,
     sellingPrice: 850,
+    minAcceptablePrice: 750,
+    willingToNegotiate: 1,
+    transactionType: 'SELL',
     description: 'Used for two engineering semesters. Crisp display, solar + battery working 100%. Includes protective slide cover.',
-    sellerName: 'Panda_27 (ECE 3rd Yr)',
-    contactInfo: 'panda27@campus.example',
-    imageUrl: ''
+    collectionLocation: 'Central Library Porch'
   },
   {
+    handle: 'Mochi_14',
     itemName: 'CLRS Introduction to Algorithms (3rd Edition)',
     category: 'Books',
     condition: 'Good',
@@ -194,12 +204,14 @@ const DEFAULT_LISTINGS = [
     originalPrice: 1450,
     suggestedPrice: 680,
     sellingPrice: 650,
+    minAcceptablePrice: 550,
+    willingToNegotiate: 1,
+    transactionType: 'SELL',
     description: 'Clean pages, minimal pencil underlines in Chapter 4. Essential for Algorithms & placement prep.',
-    sellerName: 'Mochi_14 (CSE 4th Yr)',
-    contactInfo: 'mochi14@campus.example',
-    imageUrl: ''
+    collectionLocation: 'CSE Department Lobby'
   },
   {
+    handle: 'Pixel_Fox',
     itemName: 'Btwin MyBike 26T Campus Commuter Cycle',
     category: 'Cycles',
     condition: 'Good',
@@ -207,49 +219,61 @@ const DEFAULT_LISTINGS = [
     originalPrice: 8200,
     suggestedPrice: 4350,
     sellingPrice: 4200,
+    minAcceptablePrice: 3800,
+    willingToNegotiate: 1,
+    transactionType: 'SELL',
     description: 'Recently serviced brakes and new rear tube. Comes with number lock and front basket.',
-    sellerName: 'Pixel_Fox (ME 4th Yr)',
-    contactInfo: 'pixelfox@campus.example',
-    imageUrl: ''
+    collectionLocation: 'Hostel B Cycle Stand'
   },
   {
+    handle: 'Koala_08',
     itemName: 'Arduino Uno R3 + Breadboard Sensor Kit',
     category: 'Electronics',
     condition: 'Like New',
     ageInMonths: 6,
     originalPrice: 2200,
-    suggestedPrice: 1340,
-    sellingPrice: 1300,
-    description: 'Used for a single IoT hackathon project. All ultrasonic sensors, jumper wires, and USB cable intact.',
-    sellerName: 'Koala_08 (EEE 3rd Yr)',
-    contactInfo: 'koala08@campus.example',
-    imageUrl: ''
+    suggestedPrice: null,
+    sellingPrice: 0,
+    transactionType: 'BORROW',
+    minDurationDays: 3,
+    maxDurationDays: 14,
+    refundableDeposit: 300,
+    collectionLocation: 'Innovation Tinkering Lab',
+    specialConditions: 'Return with all jumper wires & ultrasonic sensor intact.',
+    description: 'Free temporary lend for 1st/2nd year hackathon or lab projects.'
   },
   {
-    itemName: 'Foldable Wooden Hostel Study Table',
-    category: 'Furniture',
+    handle: 'Otter_91',
+    itemName: 'Acoustic Guitar 38-inch Beginner Kit',
+    category: 'Other',
     condition: 'Good',
-    ageInMonths: 22,
-    originalPrice: 1800,
-    suggestedPrice: 840,
-    sellingPrice: 800,
-    description: 'Sturdy metal legs, cup-holder slot, folds flat under hostel bed.',
-    sellerName: 'Otter_91 (CE 4th Yr)',
-    contactInfo: 'otter91@campus.example',
-    imageUrl: ''
+    ageInMonths: 16,
+    originalPrice: 4500,
+    suggestedPrice: null,
+    sellingPrice: 0,
+    transactionType: 'SWAP',
+    swapFor: 'Ergonomic Study Chair or Wireless Headphones',
+    allowMultipleSwaps: 1,
+    collectionLocation: 'Student Activity Center',
+    description: 'Clean frets, spare set of strings included. Looking to swap for dorm gear or audio gear.'
   },
   {
+    handle: 'Maple_42',
     itemName: 'Mini Drafter & Engineering Drawing Board',
     category: 'Lab Equipment',
     condition: 'Excellent',
     ageInMonths: 12,
     originalPrice: 1450,
-    suggestedPrice: 920,
-    sellingPrice: 900,
-    description: 'Complete first-year Engineering Graphics kit with carrying tube.',
-    sellerName: 'Maple_42 (Civil 2nd Yr)',
-    contactInfo: 'maple42@campus.example',
-    imageUrl: ''
+    suggestedPrice: null,
+    sellingPrice: 40,
+    rentalPricePerDay: 40,
+    minDurationDays: 2,
+    maxDurationDays: 21,
+    refundableDeposit: 200,
+    transactionType: 'RENT',
+    collectionLocation: 'Mechanical Workshop Block',
+    specialConditions: 'Keep scales clean; return in carrying tube.',
+    description: 'Rent per day for Engineering Graphics labs or end-sem drawing practicals.'
   }
 ];
 
@@ -259,7 +283,7 @@ const DEFAULT_WANTED = [
     category: 'Calculators',
     maxBudget: 750,
     description: 'Need before mid-sem exams next week. Looking for Good or Excellent condition.',
-    requestedBy: 'Sprout_19 (CSE 1st Yr)',
+    requestedBy: 'Sprout_19 🌱',
     contactInfo: 'sprout19@campus.example'
   },
   {
@@ -267,7 +291,7 @@ const DEFAULT_WANTED = [
     category: 'Cycles',
     maxBudget: 4500,
     description: 'Prefer a working lock and good tyres for daily hostel-to-department commute.',
-    requestedBy: 'Boba_33 (BT 1st Yr)',
+    requestedBy: 'Boba_33 🧋',
     contactInfo: 'boba33@campus.example'
   },
   {
@@ -275,12 +299,13 @@ const DEFAULT_WANTED = [
     category: 'Lab Equipment',
     maxBudget: 800,
     description: 'Required for Monday morning workshop lab.',
-    requestedBy: 'Finch_05 (ME 1st Yr)',
+    requestedBy: 'Finch_05 🐦',
     contactInfo: 'finch05@campus.example'
   }
 ];
 
 function seedData(db) {
+  // 1. Historical 200 rows (idempotent)
   const histCountRow = db.prepare('SELECT COUNT(*) AS count FROM historical_transactions').get();
   if (histCountRow.count < 200) {
     const records = buildHistoricalTransactions();
@@ -290,12 +315,9 @@ function seedData(db) {
       VALUES
         (@itemName, @category, @condition, @ageInMonths, @originalPrice, @soldPrice, @resaleRatio)
     `);
-
     const runSeed = db.transaction((items) => {
       db.prepare('DELETE FROM historical_transactions').run();
-      for (const item of items) {
-        insertHist.run(item);
-      }
+      for (const item of items) insertHist.run(item);
     });
     runSeed(records);
     console.log(`[Seed] Populated ${records.length} historical transactions in SQLite.`);
@@ -303,21 +325,119 @@ function seedData(db) {
     console.log(`[Seed] Historical transactions already present (${histCountRow.count} rows). Skipping duplicate seed.`);
   }
 
-  const listingsCountRow = db.prepare('SELECT COUNT(*) AS count FROM listings').get();
-  if (listingsCountRow.count === 0) {
-    const insertListing = db.prepare(`
-      INSERT INTO listings
-        (item_name, category, condition_grade, age_in_months, original_price, suggested_price, selling_price, description, seller_name, contact_info, image_url)
-      VALUES
-        (@itemName, @category, @condition, @ageInMonths, @originalPrice, @suggestedPrice, @sellingPrice, @description, @sellerName, @contactInfo, @imageUrl)
+  // 2. Demo pseudonymous users (idempotent)
+  const userCountRow = db.prepare('SELECT COUNT(*) AS count FROM users').get();
+  if (userCountRow.count === 0) {
+    const insertUser = db.prepare(`
+      INSERT INTO users (handle, avatar_emoji, department, is_demo, is_verified)
+      VALUES (@handle, @avatarEmoji, @department, 1, @isVerified)
     `);
-    const insertMany = db.transaction((items) => {
-      for (const item of items) insertListing.run(item);
+    const insertUsers = db.transaction((users) => {
+      for (const u of users) insertUser.run(u);
     });
-    insertMany(DEFAULT_LISTINGS);
-    console.log(`[Seed] Populated ${DEFAULT_LISTINGS.length} initial campus listings.`);
+    insertUsers(DEMO_USERS);
   }
 
+  const userRows = db.prepare('SELECT id, handle, avatar_emoji FROM users').all();
+  const userMap = new Map(userRows.map((u) => [u.handle, u]));
+  const fallbackUser = userRows[0];
+
+  // 3. Listings (seed initial set if empty, OR upgrade legacy rows with seller_id & add sample SWAP/BORROW/RENT if none exist)
+  const listingsCountRow = db.prepare('SELECT COUNT(*) AS count FROM listings').get();
+  const insertListing = db.prepare(`
+    INSERT INTO listings (
+      seller_id, item_name, category, condition_grade, age_in_months, original_price,
+      suggested_price, selling_price, min_acceptable_price, willing_to_negotiate,
+      transaction_type, availability_status, swap_for, allow_multiple_swaps,
+      rental_price_per_day, min_duration_days, max_duration_days, refundable_deposit,
+      collection_location, special_conditions, description, seller_name, contact_info, image_url
+    ) VALUES (
+      @sellerId, @itemName, @category, @condition, @ageInMonths, @originalPrice,
+      @suggestedPrice, @sellingPrice, @minAcceptablePrice, @willingToNegotiate,
+      @transactionType, 'AVAILABLE', @swapFor, @allowMultipleSwaps,
+      @rentalPricePerDay, @minDurationDays, @maxDurationDays, @refundableDeposit,
+      @collectionLocation, @specialConditions, @description, @sellerName, @contactInfo, ''
+    )
+  `);
+
+  if (listingsCountRow.count === 0) {
+    const insertMany = db.transaction((items) => {
+      for (const item of items) {
+        const u = userMap.get(item.handle) || fallbackUser;
+        insertListing.run({
+          sellerId: u.id,
+          itemName: item.itemName,
+          category: item.category,
+          condition: item.condition,
+          ageInMonths: item.ageInMonths,
+          originalPrice: item.originalPrice,
+          suggestedPrice: item.suggestedPrice ?? null,
+          sellingPrice: item.sellingPrice ?? 0,
+          minAcceptablePrice: item.minAcceptablePrice ?? null,
+          willingToNegotiate: item.willingToNegotiate ?? 1,
+          transactionType: item.transactionType,
+          swapFor: item.swapFor || '',
+          allowMultipleSwaps: item.allowMultipleSwaps ?? 1,
+          rentalPricePerDay: item.rentalPricePerDay ?? null,
+          minDurationDays: item.minDurationDays ?? null,
+          maxDurationDays: item.maxDurationDays ?? null,
+          refundableDeposit: item.refundableDeposit ?? 0,
+          collectionLocation: item.collectionLocation || '',
+          specialConditions: item.specialConditions || '',
+          description: item.description || '',
+          sellerName: `${u.handle} ${u.avatar_emoji}`,
+          contactInfo: `${u.handle.toLowerCase()}@campus.example`
+        });
+      }
+    });
+    insertMany(DEFAULT_LISTINGS);
+    console.log(`[Seed] Populated ${DEFAULT_LISTINGS.length} initial unified listings.`);
+  } else {
+    // Safe backward compatibility: ensure existing legacy rows have seller_id & transaction_type
+    if (fallbackUser) {
+      db.prepare(
+        `UPDATE listings SET seller_id = ?, seller_name = COALESCE(NULLIF(seller_name, ''), ?) WHERE seller_id IS NULL`
+      ).run(fallbackUser.id, `${fallbackUser.handle} ${fallbackUser.avatar_emoji}`);
+    }
+    // Add one sample SWAP/BORROW/RENT if only SELL listings existed before Phase 1 migration
+    const nonSellCount = db.prepare("SELECT COUNT(*) AS c FROM listings WHERE transaction_type != 'SELL'").get().c;
+    if (nonSellCount === 0) {
+      const extraTypes = DEFAULT_LISTINGS.filter((d) => d.transactionType !== 'SELL');
+      const insertExtras = db.transaction((items) => {
+        for (const item of items) {
+          const u = userMap.get(item.handle) || fallbackUser;
+          insertListing.run({
+            sellerId: u.id,
+            itemName: item.itemName,
+            category: item.category,
+            condition: item.condition,
+            ageInMonths: item.ageInMonths,
+            originalPrice: item.originalPrice,
+            suggestedPrice: item.suggestedPrice ?? null,
+            sellingPrice: item.sellingPrice ?? 0,
+            minAcceptablePrice: null,
+            willingToNegotiate: 0,
+            transactionType: item.transactionType,
+            swapFor: item.swapFor || '',
+            allowMultipleSwaps: item.allowMultipleSwaps ?? 1,
+            rentalPricePerDay: item.rentalPricePerDay ?? null,
+            minDurationDays: item.minDurationDays ?? null,
+            maxDurationDays: item.maxDurationDays ?? null,
+            refundableDeposit: item.refundableDeposit ?? 0,
+            collectionLocation: item.collectionLocation || '',
+            specialConditions: item.specialConditions || '',
+            description: item.description || '',
+            sellerName: `${u.handle} ${u.avatar_emoji}`,
+            contactInfo: `${u.handle.toLowerCase()}@campus.example`
+          });
+        }
+      });
+      insertExtras(extraTypes);
+      console.log('[Seed] Added sample SWAP, BORROW, and RENT listings for Phase 1.');
+    }
+  }
+
+  // 4. Wanted requests (idempotent)
   const wantedCountRow = db.prepare('SELECT COUNT(*) AS count FROM wanted_requests').get();
   if (wantedCountRow.count === 0) {
     const insertWanted = db.prepare(`

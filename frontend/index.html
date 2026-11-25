@@ -64,11 +64,16 @@
       </nav>
 
       <div class="nav-actions">
+        <button id="identityChipBtn" class="identity-chip" type="button" title="Switch or customize campus demo persona">
+          <span id="identityChipEmoji">🐼</span>
+          <span id="identityChipHandle">Panda_27</span>
+          <span class="demo-micro-tag">Demo</span>
+        </button>
         <button class="btn btn-secondary btn-sm" onclick="App.openModal('wantedModal')">
           Request Item
         </button>
         <button class="btn btn-primary btn-sm" data-view-target="sell">
-          Sell an Item
+          List Item
         </button>
       </div>
     </div>
@@ -77,9 +82,9 @@
   <!-- Dark Ink Ticker Strip (Ref 5) -->
   <div class="ticker" aria-hidden="true">
     <div class="ticker-track">
-      <span>BUY <em class="ticker-dot">★</em> FAIR PRICE <em class="ticker-dot">★</em> CAMPUS PICKUP <em class="ticker-dot">★</em> WANTED BOARD <em class="ticker-dot">★</em> ZERO FEES <em class="ticker-dot">★</em> 200+ REAL SALES</span>
-      <span>BUY <em class="ticker-dot">★</em> FAIR PRICE <em class="ticker-dot">★</em> CAMPUS PICKUP <em class="ticker-dot">★</em> WANTED BOARD <em class="ticker-dot">★</em> ZERO FEES <em class="ticker-dot">★</em> 200+ REAL SALES</span>
-      <span>BUY <em class="ticker-dot">★</em> FAIR PRICE <em class="ticker-dot">★</em> CAMPUS PICKUP <em class="ticker-dot">★</em> WANTED BOARD <em class="ticker-dot">★</em> ZERO FEES <em class="ticker-dot">★</em> 200+ REAL SALES</span>
+      <span>BUY <em class="ticker-dot">★</em> SWAP <em class="ticker-dot">★</em> BORROW <em class="ticker-dot">★</em> RENT <em class="ticker-dot">★</em> FAIR PRICE <em class="ticker-dot">★</em> LITTLE LOOPS <em class="ticker-dot">★</em> 200+ REAL SALES</span>
+      <span>BUY <em class="ticker-dot">★</em> SWAP <em class="ticker-dot">★</em> BORROW <em class="ticker-dot">★</em> RENT <em class="ticker-dot">★</em> FAIR PRICE <em class="ticker-dot">★</em> LITTLE LOOPS <em class="ticker-dot">★</em> 200+ REAL SALES</span>
+      <span>BUY <em class="ticker-dot">★</em> SWAP <em class="ticker-dot">★</em> BORROW <em class="ticker-dot">★</em> RENT <em class="ticker-dot">★</em> FAIR PRICE <em class="ticker-dot">★</em> LITTLE LOOPS <em class="ticker-dot">★</em> 200+ REAL SALES</span>
     </div>
   </div>
 
@@ -99,7 +104,7 @@
             Don't buy new. Your campus already has it.
           </h1>
           <p class="hero-subtitle">
-            ReLoop connects graduating seniors and incoming juniors with explainable, data-driven fair prices backed by 200 historical campus transactions.
+            Buy, swap, borrow, or rent from fellow students with pseudonymous campus profiles, Little Loops item buddies, and explainable pricing backed by 200 historical sales.
           </p>
           <div class="hero-cta-row">
             <button class="btn btn-primary btn-lg" onclick="document.getElementById('marketplaceCatalog').scrollIntoView({behavior:'smooth'})">
@@ -118,7 +123,7 @@
         <div class="hero-visual">
           <div class="hero-circle-frame">
             <div class="hero-speech-bubble">
-              Fair price, zero guesswork! 🧮
+              Buy, swap, borrow, or rent—zero guesswork! 🧮
             </div>
             <!-- Handcrafted Neo-Brutalist Campus Buddy SVG -->
             <svg viewBox="0 0 240 240" width="245" height="245" aria-label="ReLoop Campus Mascot">
@@ -173,12 +178,12 @@
             <p>Weighted similarity pricing compares condition and age against 200 real campus sales in seconds.</p>
           </div>
           <div class="feature-pastel-card bg-pink">
-            <h3><i data-lucide="shield-check" style="width:18px;height:18px;"></i> Transparent Ranges</h3>
-            <p>Every listing displays clear min-max valuation context so neither seniors nor juniors overpay.</p>
+            <h3><i data-lucide="repeat" style="width:18px;height:18px;"></i> 4 Ways to Loop</h3>
+            <p>Sell unused gear, swap textbooks, borrow lab coats for free, or rent items by the day.</p>
           </div>
           <div class="feature-pastel-card bg-purple">
-            <h3><i data-lucide="map-pin" style="width:18px;height:18px;"></i> Zero-Fee Pickup</h3>
-            <p>Meet right at campus hostels, libraries, or department lobbies—₹0 shipping or middleman fees.</p>
+            <h3><i data-lucide="shield" style="width:18px;height:18px;"></i> Pseudonymous &amp; Private</h3>
+            <p>Browse with fun student handles like Panda_27 and keep minimum acceptable prices private.</p>
           </div>
         </div>
       </div>
@@ -198,11 +203,21 @@
         <div class="search-primary-row">
           <div class="search-input-wrapper">
             <i data-lucide="search"></i>
-            <input type="text" id="searchInput" class="search-input" placeholder="Search calculators, textbooks, bicycles, lab kits, furniture...">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search calculators, textbooks, bicycles, swap items, rentals...">
           </div>
           <button class="btn btn-primary" onclick="App.executeSearch()">
             <i data-lucide="search" style="width:16px;height:16px;"></i> Search
           </button>
+        </div>
+
+        <!-- Transaction Type Filter Pills -->
+        <div class="type-filter-row" role="group" aria-label="Transaction type filter">
+          <span style="font-family:var(--font-mono); font-size:0.74rem; font-weight:700; text-transform:uppercase; margin-right:4px;">Mode:</span>
+          <button type="button" class="type-filter-btn active" data-type="All">All Types</button>
+          <button type="button" class="type-filter-btn" data-type="SELL">Sell</button>
+          <button type="button" class="type-filter-btn" data-type="SWAP">Swap</button>
+          <button type="button" class="type-filter-btn" data-type="BORROW">Borrow (Free)</button>
+          <button type="button" class="type-filter-btn" data-type="RENT">Rent</button>
         </div>
 
         <div class="filter-secondary-row">
@@ -248,7 +263,7 @@
       <div id="listingsEmptyState" class="empty-state" style="display: none;">
         <div class="empty-state-icon">📦</div>
         <h3 class="empty-state-title">No Listings Match Your Search</h3>
-        <p class="empty-state-desc">Try clearing a filter or adjusting your keyword—or be the first senior to list this item!</p>
+        <p class="empty-state-desc">Try clearing a filter or adjusting your keyword—or be the first student to list this item!</p>
         <button class="btn btn-yellow" data-view-target="sell">
           <i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Post This Item
         </button>
@@ -268,8 +283,8 @@
             <div class="stats-band-label">Avg Value Retained</div>
           </div>
           <div class="stats-band-card">
-            <div class="stats-band-value">7</div>
-            <div class="stats-band-label">Campus Categories</div>
+            <div class="stats-band-value">4</div>
+            <div class="stats-band-label">Exchange Modes</div>
           </div>
           <div class="stats-band-card">
             <div class="stats-band-value">₹0</div>
@@ -287,7 +302,7 @@
           <h2 class="section-title">
             HOW RELOOP <span class="word-box bg-teal">WORKS</span>
           </h2>
-          <p class="section-subtitle">From fair valuation to hostel handover in three quick steps.</p>
+          <p class="section-subtitle">From fair valuation to campus handover in three quick steps.</p>
         </div>
 
         <div class="steps-grid">
@@ -298,13 +313,13 @@
           </div>
           <div class="step-card">
             <span class="step-num-badge bg-pink">02</span>
-            <h3 class="step-title">Campus Handover</h3>
-            <p class="step-desc">Skip courier charges. Connect directly with incoming juniors for quick library, quad, or hostel pickup.</p>
+            <h3 class="step-title">Choose Your Loop Mode</h3>
+            <p class="step-desc">List items to Sell with private reserve pricing, Swap with peers, Borrow for free, or Rent by the day.</p>
           </div>
           <div class="step-card">
             <span class="step-num-badge bg-sky">03</span>
-            <h3 class="step-title">Circular Savings</h3>
-            <p class="step-desc">Keep calculators, textbooks, lab kits, and bicycles circulating across batches while saving juniors up to 60%.</p>
+            <h3 class="step-title">Pseudonymous Handover</h3>
+            <p class="step-desc">Protect your privacy with campus handles like Panda_27 and meet at libraries, quads, or hostel lobbies.</p>
           </div>
         </div>
       </div>
@@ -312,7 +327,25 @@
   </main>
 
   <!-- =========================================================================
-       VIEW 2: SELL AN ITEM & PRICING ENGINE (Ref 4 Numbered Boxes)
+       VIEW 1B: LISTING DETAIL VIEW (Ref 4 Numbered Panels + Little Loops)
+       ========================================================================= -->
+  <section id="detail-view" class="app-view" style="display: none;">
+    <div class="container">
+      <div class="detail-shell">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; flex-wrap:wrap;">
+          <button type="button" id="backToMarketplaceBtn" class="btn btn-secondary btn-sm">
+            <i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Back to Marketplace
+          </button>
+          <span class="tag" id="detailListingIdTag">Listing #0</span>
+        </div>
+
+        <div id="detailContent"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       VIEW 2: LIST AN ITEM (UNIFIED SELL / SWAP / BORROW / RENT)
        ========================================================================= -->
   <section id="sell-view" class="app-view" style="display: none;">
     <div class="container">
@@ -320,9 +353,9 @@
         <div class="sell-yellow-banner">
           <div>
             <h2>List an Item on ReLoop</h2>
-            <p>Check the fair resale value from 200 historical campus sales before you publish.</p>
+            <p>Sell, swap, lend for free, or rent out campus gear—backed by 200 historical sales.</p>
           </div>
-          <span class="tag">Explainable Pricing</span>
+          <span class="tag">SELL · SWAP · BORROW · RENT</span>
         </div>
 
         <!-- Judge Demo Shortcut -->
@@ -337,6 +370,8 @@
         </div>
 
         <form id="sellItemForm">
+          <input type="hidden" id="sellTransactionType" value="SELL">
+
           <!-- Panel 1: About the Item -->
           <div class="numbered-section">
             <div class="numbered-section-head bg-mint">
@@ -344,7 +379,7 @@
                 <span class="num-pill">1</span>
                 <span>About the Item</span>
               </div>
-              <span class="tag">Required Fields</span>
+              <span class="tag">Required Details</span>
             </div>
             <div class="numbered-section-body">
               <div class="form-group">
@@ -383,121 +418,277 @@
                 </div>
               </div>
 
-              <div class="form-grid-2" style="margin-bottom:0;">
-                <div class="form-group" style="margin-bottom:0;">
+              <div class="form-grid-2">
+                <div class="form-group">
                   <label class="form-label" for="sellAge">
                     <span>Age in Months *</span>
-                    <span class="form-label-hint">Months used</span>
+                    <span class="form-label-hint">Months owned</span>
                   </label>
-                  <input type="number" id="sellAge" class="form-control" placeholder="e.g. 24" min="0" max="120" required>
+                  <input type="number" id="sellAge" class="form-control" placeholder="e.g. 24" min="0" max="240" required>
                 </div>
 
-                <div class="form-group" style="margin-bottom:0;">
+                <div class="form-group">
                   <label class="form-label" for="sellOriginalPrice">
-                    <span>Original Price (₹) *</span>
-                    <span class="form-label-hint">Retail cost</span>
+                    <span>Original Retail Price (₹) *</span>
+                    <span class="form-label-hint">Baseline value</span>
                   </label>
                   <input type="number" id="sellOriginalPrice" class="form-control" placeholder="e.g. 1200" min="50" required>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Panel 2: Fair Price Check -->
-          <div class="numbered-section">
-            <div class="numbered-section-head bg-yellow">
-              <div class="numbered-section-title">
-                <span class="num-pill">2</span>
-                <span>Data-Driven Fair Price Check</span>
-              </div>
-              <span class="tag">200 SQLite Sales</span>
-            </div>
-            <div class="numbered-section-body">
-              <button type="button" id="calculatePriceBtn" class="btn btn-primary btn-lg" style="width: 100%;">
-                <i data-lucide="sparkles"></i> Get Fair Price
-              </button>
-
-              <!-- Pricing Result Card -->
-              <div id="pricingResultCard" class="pricing-result-card">
-                <div class="pricing-result-header">
-                  <span class="tag bg-teal">Fair Valuation Ready</span>
-                  <span class="tag" id="cardComparableCount">0 Comparable Sales</span>
-                </div>
-
-                <div class="pricing-highlight-row">
-                  <div>
-                    <div style="font-size:0.82rem; font-weight:700; text-transform:uppercase;">Recommended Price</div>
-                    <div class="suggested-price-amount" id="cardSuggestedPrice">₹0</div>
-                  </div>
-                  <div class="starburst-badge">
-                    <div style="font-family:var(--font-mono); font-size:0.7rem; font-weight:700;">FAIR RANGE</div>
-                    <div style="font-size:1.15rem; font-weight:800;" id="cardPriceRange">₹0 – ₹0</div>
-                  </div>
-                </div>
-
-                <div class="price-meter-track">
-                  <div class="price-meter-fill" id="cardPriceMeterFill"></div>
-                </div>
-
-                <div class="pricing-metrics-row">
-                  <span class="chip bg-peach" id="cardDepreciation">0% Depreciation</span>
-                  <span class="chip bg-mint" id="cardRetention">0% Value Retained</span>
-                </div>
-
-                <div class="pricing-explanation-box" id="cardExplanation">
-                  Recommendation explanation will appear here...
-                </div>
-
-                <div style="margin-top: 14px; text-align: right;">
-                  <button type="button" id="applySuggestedPriceBtn" class="btn btn-yellow btn-sm">
-                    <i data-lucide="check" style="width:14px;height:14px;"></i> Apply Recommended Price
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Panel 3: Price & Publish -->
-          <div class="numbered-section">
-            <div class="numbered-section-head bg-pink">
-              <div class="numbered-section-title">
-                <span class="num-pill">3</span>
-                <span>Your Price &amp; Contact Details</span>
-              </div>
-              <span class="tag">Instant Publish</span>
-            </div>
-            <div class="numbered-section-body">
-              <div class="form-group">
-                <label class="form-label" for="sellSellingPrice">
-                  <span>Your Asking Price (₹) *</span>
-                  <span class="form-label-hint">Adjust or accept the suggested price</span>
-                </label>
-                <input type="number" id="sellSellingPrice" class="form-control" placeholder="Enter your selling price" min="10" required>
-              </div>
 
               <div class="form-group">
                 <label class="form-label" for="sellDescription">Item Description</label>
-                <textarea id="sellDescription" class="form-control" placeholder="Condition notes, included accessories, or pickup preference..."></textarea>
+                <textarea id="sellDescription" class="form-control" placeholder="Condition notes, included accessories, or semester tips..."></textarea>
               </div>
 
-              <div class="form-grid-2">
-                <div class="form-group">
-                  <label class="form-label" for="sellSellerName">Display Handle / Name</label>
-                  <input type="text" id="sellSellerName" class="form-control" placeholder="e.g. Panda_27 (EE 4th Yr)" value="Campus Senior">
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label" for="sellContact">Campus Contact</label>
-                  <input type="text" id="sellContact" class="form-control" placeholder="e.g. panda27@campus.example" value="senior@campus.example">
-                </div>
-              </div>
-
-              <div class="form-group">
+              <div class="form-group" style="margin-bottom:0;">
                 <label class="form-label" for="sellImageUrl">
                   <span>Image URL (Optional)</span>
                   <span class="form-label-hint">Leave blank for category illustration</span>
                 </label>
                 <input type="url" id="sellImageUrl" class="form-control" placeholder="https://...">
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 2: Choose How (Ref 5 Comic Cover Plan Cards) -->
+          <div class="numbered-section">
+            <div class="numbered-section-head bg-yellow">
+              <div class="numbered-section-title">
+                <span class="num-pill">2</span>
+                <span>Choose How</span>
+              </div>
+              <span class="tag">Unified Listing Mode</span>
+            </div>
+            <div class="numbered-section-body">
+              <div class="plan-cards-grid" role="radiogroup" aria-label="Choose listing transaction type">
+                <button type="button" class="plan-card active" data-plan-type="SELL" aria-checked="true">
+                  <div class="plan-card-head bg-yellow">
+                    <span>SELL</span>
+                    <span>💰</span>
+                  </div>
+                  <div class="plan-card-body">
+                    <strong>Resell for ₹</strong>
+                    Set an asking price with AI-backed fair range &amp; private reserve.
+                  </div>
+                </button>
+
+                <button type="button" class="plan-card" data-plan-type="SWAP" aria-checked="false">
+                  <div class="plan-card-head bg-purple">
+                    <span>SWAP</span>
+                    <span>🔄</span>
+                  </div>
+                  <div class="plan-card-body">
+                    <strong>Trade with Peers</strong>
+                    Exchange directly for books, gear, or items you need next.
+                  </div>
+                </button>
+
+                <button type="button" class="plan-card" data-plan-type="BORROW" aria-checked="false">
+                  <div class="plan-card-head bg-teal">
+                    <span>BORROW</span>
+                    <span>🤝</span>
+                  </div>
+                  <div class="plan-card-body">
+                    <strong>Lend for Free</strong>
+                    Temporary ₹0 campus lending with optional refundable deposit.
+                  </div>
+                </button>
+
+                <button type="button" class="plan-card" data-plan-type="RENT" aria-checked="false">
+                  <div class="plan-card-head bg-coral">
+                    <span>RENT</span>
+                    <span>⏱️</span>
+                  </div>
+                  <div class="plan-card-body">
+                    <strong>Rent per Day</strong>
+                    Charge a daily rate with min/max rental days &amp; pickup spot.
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 3: Price & Type-Specific Details -->
+          <div class="numbered-section">
+            <div class="numbered-section-head bg-pink">
+              <div class="numbered-section-title">
+                <span class="num-pill">3</span>
+                <span id="panel3Heading">Price &amp; Negotiation Details</span>
+              </div>
+              <span class="tag" id="panel3TypeTag">SELL MODE</span>
+            </div>
+            <div class="numbered-section-body">
+              <!-- SELL FIELDS -->
+              <div id="sellTypeFields">
+                <button type="button" id="calculatePriceBtn" class="btn btn-primary btn-lg" style="width: 100%; margin-bottom:18px;">
+                  <i data-lucide="sparkles"></i> Get Fair Price
+                </button>
+
+                <!-- Pricing Result Card -->
+                <div id="pricingResultCard" class="pricing-result-card" style="margin-top:0; margin-bottom:20px;">
+                  <div class="pricing-result-header">
+                    <span class="tag bg-teal">Fair Valuation Ready</span>
+                    <span class="tag" id="cardComparableCount">0 Comparable Sales</span>
+                  </div>
+
+                  <div class="pricing-highlight-row">
+                    <div>
+                      <div style="font-size:0.82rem; font-weight:700; text-transform:uppercase;">Recommended Price</div>
+                      <div class="suggested-price-amount" id="cardSuggestedPrice">₹0</div>
+                    </div>
+                    <div class="starburst-badge">
+                      <div style="font-family:var(--font-mono); font-size:0.7rem; font-weight:700;">FAIR RANGE</div>
+                      <div style="font-size:1.15rem; font-weight:800;" id="cardPriceRange">₹0 – ₹0</div>
+                    </div>
+                  </div>
+
+                  <div class="price-meter-track">
+                    <div class="price-meter-fill" id="cardPriceMeterFill"></div>
+                  </div>
+
+                  <div class="pricing-metrics-row">
+                    <span class="chip bg-peach" id="cardDepreciation">0% Depreciation</span>
+                    <span class="chip bg-mint" id="cardRetention">0% Value Retained</span>
+                  </div>
+
+                  <div class="pricing-explanation-box" id="cardExplanation">
+                    Recommendation explanation will appear here...
+                  </div>
+
+                  <div style="margin-top: 14px; text-align: right;">
+                    <button type="button" id="applySuggestedPriceBtn" class="btn btn-yellow btn-sm">
+                      <i data-lucide="check" style="width:14px;height:14px;"></i> Apply Recommended Price
+                    </button>
+                  </div>
+                </div>
+
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label class="form-label" for="sellSellingPrice">
+                      <span>Your Asking Price (₹) *</span>
+                      <span class="form-label-hint">Public listing price</span>
+                    </label>
+                    <input type="number" id="sellSellingPrice" class="form-control" placeholder="e.g. 700" min="1">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="sellMinPrice">
+                      <span>Minimum Acceptable Price (₹)</span>
+                      <span class="form-label-hint">Private · Never shown to buyers</span>
+                    </label>
+                    <input type="number" id="sellMinPrice" class="form-control" placeholder="Optional private floor (e.g. 600)" min="0">
+                  </div>
+                </div>
+
+                <div class="nb-toggle-row">
+                  <div>
+                    <strong style="font-size:0.9rem; display:block;">Willing to Negotiate</strong>
+                    <span style="font-size:0.78rem; color:var(--ink-muted);">Let buyers know whether offers are welcome during meetup.</span>
+                  </div>
+                  <label class="nb-switch" aria-label="Willing to negotiate">
+                    <input type="checkbox" id="sellNegotiate" checked>
+                    <span class="nb-switch-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- SWAP FIELDS -->
+              <div id="swapTypeFields" style="display:none;">
+                <div class="form-group">
+                  <label class="form-label" for="sellSwapFor">
+                    <span>Items or Categories Wanted in Exchange *</span>
+                    <span class="form-label-hint">What would you trade this for?</span>
+                  </label>
+                  <input type="text" id="sellSwapFor" class="form-control" placeholder="e.g. GATE CS Books, Study Lamp, or Bluetooth Mouse">
+                </div>
+
+                <div class="nb-toggle-row">
+                  <div>
+                    <strong style="font-size:0.9rem; display:block;">Accept Multiple Swap Possibilities</strong>
+                    <span style="font-size:0.78rem; color:var(--ink-muted);">Allow students to propose other fair items or combinations.</span>
+                  </div>
+                  <label class="nb-switch" aria-label="Accept multiple swap possibilities">
+                    <input type="checkbox" id="sellMultiSwap" checked>
+                    <span class="nb-switch-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- BORROW FIELDS -->
+              <div id="borrowTypeFields" style="display:none;">
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label class="form-label" for="sellBorrowMinDays">Min Borrowing Days</label>
+                    <input type="number" id="sellBorrowMinDays" class="form-control" placeholder="e.g. 1" min="1" value="1">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="sellBorrowMaxDays">Max Borrowing Days</label>
+                    <input type="number" id="sellBorrowMaxDays" class="form-control" placeholder="e.g. 7" min="1" value="7">
+                  </div>
+                </div>
+
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label class="form-label" for="sellBorrowLocation">Collection Location *</label>
+                    <input type="text" id="sellBorrowLocation" class="form-control" placeholder="e.g. Central Library Porch / Hostel B">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="sellBorrowDeposit">Optional Refundable Deposit (₹)</label>
+                    <input type="number" id="sellBorrowDeposit" class="form-control" placeholder="0 for no deposit" min="0" value="0">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="sellBorrowConditions">Special Borrowing Conditions</label>
+                  <input type="text" id="sellBorrowConditions" class="form-control" placeholder="e.g. Return clean before Friday evening">
+                </div>
+              </div>
+
+              <!-- RENT FIELDS -->
+              <div id="rentTypeFields" style="display:none;">
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label class="form-label" for="sellRentPerDay">Rental Price per Day (₹) *</label>
+                    <input type="number" id="sellRentPerDay" class="form-control" placeholder="e.g. 40" min="1">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="sellRentDeposit">Optional Refundable Deposit (₹)</label>
+                    <input type="number" id="sellRentDeposit" class="form-control" placeholder="e.g. 300" min="0" value="0">
+                  </div>
+                </div>
+
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label class="form-label" for="sellRentMinDays">Min Rental Days</label>
+                    <input type="number" id="sellRentMinDays" class="form-control" placeholder="e.g. 2" min="1" value="1">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="sellRentMaxDays">Max Rental Days</label>
+                    <input type="number" id="sellRentMaxDays" class="form-control" placeholder="e.g. 14" min="1" value="14">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="sellRentLocation">Collection Location *</label>
+                  <input type="text" id="sellRentLocation" class="form-control" placeholder="e.g. Mechanical Block Lobby">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="sellRentConditions">Rental Conditions</label>
+                  <input type="text" id="sellRentConditions" class="form-control" placeholder="e.g. Valid campus ID on pickup; return in same case">
+                </div>
+              </div>
+
+              <!-- Pseudonymous Identity Strip -->
+              <div class="nb-toggle-row" style="background:#FFF9E6;">
+                <div>
+                  <span style="font-family:var(--font-mono); font-size:0.7rem; font-weight:700; text-transform:uppercase; display:block;">Publishing As</span>
+                  <strong id="sellPostingAs" style="font-size:0.94rem;">🐼 Panda_27 (Demo)</strong>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="App.openAuthModal()">
+                  Switch / Edit Avatar
+                </button>
               </div>
 
               <button type="submit" id="publishListingBtn" class="btn btn-teal btn-lg" style="width: 100%;">
@@ -639,17 +830,50 @@
   <!-- =========================================================================
        MODALS
        ========================================================================= -->
-  <div id="itemDetailModal" class="modal-overlay">
+  <div id="authModal" class="modal-overlay">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 class="modal-title">Listing Details</h3>
-        <button class="modal-close-btn" data-close-modal="itemDetailModal" aria-label="Close modal">
+        <h3 class="modal-title">Campus Identity &amp; Avatar</h3>
+        <button class="modal-close-btn" data-close-modal="authModal" aria-label="Close modal">
           <i data-lucide="x" style="width:18px;height:18px;"></i>
         </button>
       </div>
-      <div class="modal-body" id="itemModalBody"></div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary btn-sm" data-close-modal="itemDetailModal">Close</button>
+      <div class="modal-body">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+          <span class="tag bg-mint">Pseudonymous · Privacy-First</span>
+          <button type="button" id="randomPersonaBtn" class="btn btn-yellow btn-sm">
+            <i data-lucide="shuffle" style="width:14px;height:14px;"></i> New Random Identity
+          </button>
+        </div>
+
+        <div style="font-family:var(--font-mono); font-size:0.74rem; font-weight:700; text-transform:uppercase; margin-bottom:8px;">Switch Demo Persona</div>
+        <div id="personaList" class="persona-grid"></div>
+
+        <hr style="border:none; border-top:2px dashed rgba(17,17,17,0.2); margin:16px 0;">
+
+        <form id="saveProfileForm">
+          <div style="font-family:var(--font-mono); font-size:0.74rem; font-weight:700; text-transform:uppercase; margin-bottom:10px;">Customize Current Handle &amp; Emoji</div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="profileHandleInput">Handle *</label>
+              <input type="text" id="profileHandleInput" class="form-control" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]+" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profileDeptInput">Campus Role / Dept</label>
+              <input type="text" id="profileDeptInput" class="form-control" maxlength="60" placeholder="e.g. CSE 3rd Yr (Demo)">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label">Emoji Avatar</label>
+            <input type="hidden" id="profileEmojiInput" value="🐼">
+            <div id="emojiPickerRow" class="emoji-picker-row"></div>
+          </div>
+
+          <button type="submit" class="btn btn-teal" style="width:100%;">
+            <i data-lucide="check" style="width:16px;height:16px;"></i> Save Identity
+          </button>
+        </form>
       </div>
     </div>
   </div>

@@ -11,6 +11,7 @@ const { seedData } = require('./database/seed');
 const listingRoutes = require('./routes/listingRoutes');
 const pricingRoutes = require('./routes/pricingRoutes');
 const wantedRoutes = require('./routes/wantedRoutes');
+const authRoutes = require('./routes/authRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -42,6 +43,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/listings', listingRoutes);
 app.use('/api/pricing', pricingRoutes);
 app.use('/api/wanted', wantedRoutes);
