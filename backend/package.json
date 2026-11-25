@@ -1,7 +1,7 @@
 {
-  "name": "reloop-backend",
+  "name": "campus-thrift-backend",
   "version": "1.0.0",
-  "description": "ReLoop - The Smart Campus Resale Marketplace Backend",
+  "description": "Campus Thrift - Smart Campus Circular Marketplace Backend",
   "type": "commonjs",
   "main": "server.js",
   "scripts": {

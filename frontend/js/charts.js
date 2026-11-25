@@ -1,4 +1,4 @@
-// ReLoop Analytics Visualizations powered by Chart.js — Neo-Brutalist Flat Palette
+// Campus Thrift Analytics Visualizations powered by Chart.js — Neo-Brutalist Flat Palette
 
 const ChartManager = {
   instances: {},

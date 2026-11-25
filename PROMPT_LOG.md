@@ -1,4 +1,4 @@
-# AI Development Log: ReLoop Campus Circular Marketplace
+# AI Development Log: Campus Thrift Circular Marketplace
 
 ## 1. Phase History & Prompts
 
@@ -6,7 +6,10 @@
 > "Replace MySQL with SQLite (`better-sqlite3`), creating the same three tables automatically on first run, with the same 200-row seed and no duplicates on restart. Keep the API contract unchanged. Target: `npm install && npm start` works with no external database. Remove secrets: keep only `.env.example`."
 
 ### Phase 1: Foundation, Redesign and Unified Listing Types
-> "Extend ReLoop incrementally without rewriting from scratch: preserve the existing 200-row historical dataset and weighted pricing engine, redesign the UI following the Neo-Brutalist reference screenshots, implement pseudonymous student identities (`users` + `sessions`), add unified `SELL`/`SWAP`/`BORROW`/`RENT` listings with private `min_acceptable_price`, and add deterministic Little Loops item mascots."
+> "Extend the project incrementally without rewriting from scratch: preserve the existing 200-row historical dataset and weighted pricing engine, redesign the UI following the Neo-Brutalist reference screenshots, implement pseudonymous student identities (`users` + `sessions`), add unified `SELL`/`SWAP`/`BORROW`/`RENT` listings with private `min_acceptable_price`, and add deterministic Little Loops item mascots."
+
+### Phase 1 Update: Showcase Dummy Data, Card Visual Polish & Rename to Campus Thrift
+> "Add the dummy data in this and change the name of the project from ReLoop to Campus Thrift."
 
 ---
 
@@ -50,3 +53,5 @@
 - [x] Unified `SELL`, `SWAP`, `BORROW`, `RENT` listing creation, search filtering, and 4-panel Listing Detail view working.
 - [x] `minAcceptablePrice` verified absent from all public API responses.
 - [x] Little Loops deterministic item mascots verified on cards and detail view.
+- [x] Showcase dummy data (11 demo users, 10 unified listings, 4 wanted requests) seeded idempotently with offline SVG image fallbacks.
+- [x] Project renamed from `ReLoop` to `Campus Thrift` across UI, backend metadata, and documentation.

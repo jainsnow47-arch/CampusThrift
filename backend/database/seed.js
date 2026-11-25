@@ -171,136 +171,225 @@ function buildHistoricalTransactions() {
 }
 
 const DEMO_USERS = [
-  { handle: 'Panda_27', avatarEmoji: '🐼', department: 'ECE 3rd Yr (Demo)', isVerified: 1 },
-  { handle: 'Mochi_14', avatarEmoji: '🍡', department: 'CSE 4th Yr (Demo)', isVerified: 1 },
-  { handle: 'Pixel_Fox', avatarEmoji: '🦊', department: 'ME 4th Yr (Demo)', isVerified: 0 },
-  { handle: 'Koala_08', avatarEmoji: '🐨', department: 'EEE 3rd Yr (Demo)', isVerified: 1 },
-  { handle: 'Otter_91', avatarEmoji: '🦦', department: 'CE 2nd Yr (Demo)', isVerified: 0 },
-  { handle: 'Maple_42', avatarEmoji: '🍁', department: 'BT 1st Yr (Demo)', isVerified: 0 }
+  { handle: 'Panda_27', avatarEmoji: '🐼', department: 'CSE Block • Synthetic Demo', isVerified: 1 },
+  { handle: 'Mochi_14', avatarEmoji: '🍡', department: 'ECE Wing • Synthetic Demo', isVerified: 1 },
+  { handle: 'Pixel_Fox', avatarEmoji: '🦊', department: 'IT Hostel • Synthetic Demo', isVerified: 0 },
+  { handle: 'Koala_88', avatarEmoji: '🐨', department: 'Mech Quad • Synthetic Demo', isVerified: 1 },
+  { handle: 'Sprout_09', avatarEmoji: '🌱', department: 'Civil Dept • Synthetic Demo', isVerified: 0 },
+  { handle: 'Otter_42', avatarEmoji: '🦦', department: 'Biotech Lab • Synthetic Demo', isVerified: 1 },
+  { handle: 'Boba_19', avatarEmoji: '🧋', department: 'Library Hub • Synthetic Demo', isVerified: 0 },
+  { handle: 'Lynx_64', avatarEmoji: '🐱', department: 'EE Dorm • Synthetic Demo', isVerified: 1 },
+  { handle: 'BinaryBard', avatarEmoji: '🧭', department: 'ALL • Synthetic Demo', isVerified: 1 },
+  { handle: 'SolderPro', avatarEmoji: '🧩', department: 'ECE • Synthetic Demo', isVerified: 1 },
+  { handle: 'PixelPanda', avatarEmoji: '🦊', department: 'ME • Synthetic Demo', isVerified: 1 }
 ];
 
 const DEFAULT_LISTINGS = [
   {
-    handle: 'Panda_27',
-    itemName: 'Casio fx-991EX ClassWiz Scientific Calculator',
-    category: 'Calculators',
-    condition: 'Excellent',
-    ageInMonths: 14,
-    originalPrice: 1350,
-    suggestedPrice: 890,
-    sellingPrice: 850,
-    minAcceptablePrice: 750,
-    willingToNegotiate: 1,
-    transactionType: 'SELL',
-    description: 'Used for two engineering semesters. Crisp display, solar + battery working 100%. Includes protective slide cover.',
-    collectionLocation: 'Central Library Porch'
-  },
-  {
-    handle: 'Mochi_14',
-    itemName: 'CLRS Introduction to Algorithms (3rd Edition)',
-    category: 'Books',
-    condition: 'Good',
-    ageInMonths: 18,
-    originalPrice: 1450,
-    suggestedPrice: 680,
-    sellingPrice: 650,
-    minAcceptablePrice: 550,
-    willingToNegotiate: 1,
-    transactionType: 'SELL',
-    description: 'Clean pages, minimal pencil underlines in Chapter 4. Essential for Algorithms & placement prep.',
-    collectionLocation: 'CSE Department Lobby'
-  },
-  {
-    handle: 'Pixel_Fox',
-    itemName: 'Btwin MyBike 26T Campus Commuter Cycle',
-    category: 'Cycles',
-    condition: 'Good',
-    ageInMonths: 20,
-    originalPrice: 8200,
-    suggestedPrice: 4350,
-    sellingPrice: 4200,
-    minAcceptablePrice: 3800,
-    willingToNegotiate: 1,
-    transactionType: 'SELL',
-    description: 'Recently serviced brakes and new rear tube. Comes with number lock and front basket.',
-    collectionLocation: 'Hostel B Cycle Stand'
-  },
-  {
-    handle: 'Koala_08',
-    itemName: 'Arduino Uno R3 + Breadboard Sensor Kit',
-    category: 'Electronics',
+    handle: 'BinaryBard',
+    itemName: 'White Cotton Chemistry Lab Coat (Size M)',
+    category: 'Lab Equipment',
     condition: 'Like New',
-    ageInMonths: 6,
-    originalPrice: 2200,
+    ageInMonths: 12,
+    originalPrice: 650,
     suggestedPrice: null,
     sellingPrice: 0,
     transactionType: 'BORROW',
-    minDurationDays: 3,
-    maxDurationDays: 14,
-    refundableDeposit: 300,
-    collectionLocation: 'Innovation Tinkering Lab',
-    specialConditions: 'Return with all jumper wires & ultrasonic sensor intact.',
-    description: 'Free temporary lend for 1st/2nd year hackathon or lab projects.'
+    minDurationDays: 1,
+    maxDurationDays: 7,
+    refundableDeposit: 0,
+    collectionLocation: 'Chemistry Block Locker 4',
+    specialConditions: 'Return washed and buttoned after lab week.',
+    description: 'Clean cotton chemistry & engineering lab coat. Borrow free for weekly practicals.',
+    imageUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80'
   },
   {
-    handle: 'Otter_91',
-    itemName: 'Acoustic Guitar 38-inch Beginner Kit',
-    category: 'Other',
+    handle: 'SolderPro',
+    itemName: 'Arduino Uno + Jumper & Breadboard Kit',
+    category: 'Electronics',
     condition: 'Good',
-    ageInMonths: 16,
-    originalPrice: 4500,
+    ageInMonths: 18,
+    originalPrice: 1850,
+    suggestedPrice: null,
+    sellingPrice: 0,
+    transactionType: 'BORROW',
+    minDurationDays: 2,
+    maxDurationDays: 10,
+    refundableDeposit: 200,
+    collectionLocation: 'Robotics Club Cupboard',
+    specialConditions: 'Return with all jumper wires and USB cable intact.',
+    description: 'Tested Arduino kit with breadboard and sensors for ECE/IoT mini-projects.',
+    imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    handle: 'PixelPanda',
+    itemName: 'Casio fx-991EX ClassWiz',
+    category: 'Calculators',
+    condition: 'Good',
+    ageInMonths: 24,
+    originalPrice: 1200,
+    suggestedPrice: 700,
+    sellingPrice: 780,
+    minAcceptablePrice: 680,
+    willingToNegotiate: 1,
+    transactionType: 'SELL',
+    collectionLocation: 'ME Dept Foyer',
+    description: 'High-res LCD scientific calculator with solar cell. Dialed in for semester equations.',
+    imageUrl: 'https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    handle: 'Mochi_14',
+    itemName: 'Hero Sprint 26T Mountain Gear Bicycle',
+    category: 'Cycles',
+    condition: 'Good',
+    ageInMonths: 18,
+    originalPrice: 7200,
+    suggestedPrice: 4200,
+    sellingPrice: 4000,
+    minAcceptablePrice: 3600,
+    willingToNegotiate: 1,
+    transactionType: 'SELL',
+    collectionLocation: 'Hostel Block B Cycle Stand',
+    description: '21-speed Shimano gears, newly installed brake pads and front basket. Smooth ride across campus.',
+    imageUrl: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    handle: 'Pixel_Fox',
+    itemName: 'Introduction to Algorithms (CLRS 3rd Edition)',
+    category: 'Books',
+    condition: 'Like New',
+    ageInMonths: 8,
+    originalPrice: 1450,
     suggestedPrice: null,
     sellingPrice: 0,
     transactionType: 'SWAP',
-    swapFor: 'Ergonomic Study Chair or Wireless Headphones',
+    swapFor: 'Operating Systems (Silberschatz) or Arduino Starter Kit',
     allowMultipleSwaps: 1,
-    collectionLocation: 'Student Activity Center',
-    description: 'Clean frets, spare set of strings included. Looking to swap for dorm gear or audio gear.'
+    collectionLocation: 'CSE Department Foyer',
+    description: 'Pristine condition with zero pencil markings. Looking to swap for 4th-sem textbooks or electronics kits.',
+    imageUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80'
   },
   {
-    handle: 'Maple_42',
-    itemName: 'Mini Drafter & Engineering Drawing Board',
-    category: 'Lab Equipment',
+    handle: 'Koala_88',
+    itemName: 'Logitech MK270 Wireless Keyboard & Mouse Combo',
+    category: 'Electronics',
+    condition: 'Good',
+    ageInMonths: 16,
+    originalPrice: 1899,
+    suggestedPrice: null,
+    sellingPrice: 35,
+    rentalPricePerDay: 35,
+    minDurationDays: 3,
+    maxDurationDays: 30,
+    refundableDeposit: 300,
+    transactionType: 'RENT',
+    collectionLocation: 'Main Gate Student Lounge',
+    specialConditions: 'Return with USB receiver and working batteries.',
+    description: 'Ideal for hackathon weekends or temporary desk setups. Weekly/monthly student-friendly rates.',
+    imageUrl: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    handle: 'Sprout_09',
+    itemName: 'Green Soul Ergonomic Study Desk Chair',
+    category: 'Furniture',
     condition: 'Excellent',
     ageInMonths: 12,
-    originalPrice: 1450,
+    originalPrice: 5990,
+    suggestedPrice: 3800,
+    sellingPrice: 3750,
+    minAcceptablePrice: 3300,
+    willingToNegotiate: 1,
+    transactionType: 'SELL',
+    collectionLocation: 'Hostel Block C Lobby',
+    description: 'Breathable mesh back with adjustable lumbar support and height adjustment. Saved my back during exam season.',
+    imageUrl: 'https://images.unsplash.com/photo-1580481077195-c9f280a58145?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    handle: 'Otter_42',
+    itemName: 'Mini Drafter & Engineering Drawing Board Set',
+    category: 'Lab Equipment',
+    condition: 'Good',
+    ageInMonths: 20,
+    originalPrice: 1200,
     suggestedPrice: null,
-    sellingPrice: 40,
-    rentalPricePerDay: 40,
-    minDurationDays: 2,
-    maxDurationDays: 21,
-    refundableDeposit: 200,
-    transactionType: 'RENT',
-    collectionLocation: 'Mechanical Workshop Block',
-    specialConditions: 'Keep scales clean; return in carrying tube.',
-    description: 'Rent per day for Engineering Graphics labs or end-sem drawing practicals.'
+    sellingPrice: 0,
+    transactionType: 'BORROW',
+    minDurationDays: 1,
+    maxDurationDays: 14,
+    refundableDeposit: 150,
+    collectionLocation: 'Mechanical Workshop Desk',
+    specialConditions: 'Free lending for 1st-year studio sessions. Keep scale clamp intact.',
+    description: 'Complete with scale clamp and carry case. Borrow free for your Engineering Graphics assignments!',
+    imageUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    handle: 'Boba_19',
+    itemName: 'Prestige 1.5L Stainless Steel Electric Kettle',
+    category: 'Other',
+    condition: 'Like New',
+    ageInMonths: 6,
+    originalPrice: 995,
+    suggestedPrice: 650,
+    sellingPrice: 650,
+    minAcceptablePrice: 550,
+    willingToNegotiate: 0,
+    transactionType: 'SELL',
+    collectionLocation: 'Girls Hostel Gate',
+    description: 'Boils in under 2 minutes. Automatic cut-off. Essential for late-night noodles and coffee.',
+    imageUrl: 'https://images.unsplash.com/photo-1544003484-3cd181d17917?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    handle: 'Lynx_64',
+    itemName: 'Higher Engineering Mathematics - B.S. Grewal',
+    category: 'Books',
+    condition: 'Good',
+    ageInMonths: 22,
+    originalPrice: 850,
+    suggestedPrice: null,
+    sellingPrice: 0,
+    transactionType: 'BORROW',
+    minDurationDays: 7,
+    maxDurationDays: 45,
+    refundableDeposit: 0,
+    collectionLocation: 'Central Library Steps',
+    specialConditions: 'No highlighting or dog-earing pages please.',
+    description: 'Covers M1, M2, and M3 modules completely. Free semester exam borrow for juniors.',
+    imageUrl: 'https://images.unsplash.com/photo-1532012164546-f432f2e3777f?auto=format&fit=crop&w=600&q=80'
   }
 ];
 
 const DEFAULT_WANTED = [
   {
-    itemName: 'Casio fx-991ES Plus Scientific Calculator',
+    itemName: 'Second-hand Scientific Calculator fx-991EX',
     category: 'Calculators',
     maxBudget: 750,
-    description: 'Need before mid-sem exams next week. Looking for Good or Excellent condition.',
-    requestedBy: 'Sprout_19 🌱',
-    contactInfo: 'sprout19@campus.example'
+    description: 'Urgent! Need a working Casio scientific calculator for upcoming mid-semester engineering exams.',
+    requestedBy: 'Pixel_Fox 🦊',
+    contactInfo: 'pixelfox@campus.example'
   },
   {
-    itemName: 'Single Speed Campus Cycle (26T)',
+    itemName: 'Campus Commuter Bicycle (Gear or Single Speed)',
     category: 'Cycles',
-    maxBudget: 4500,
-    description: 'Prefer a working lock and good tyres for daily hostel-to-department commute.',
-    requestedBy: 'Boba_33 🧋',
-    contactInfo: 'boba33@campus.example'
+    maxBudget: 3500,
+    description: 'Looking for a reliable cycle to travel between hostel block C and academic departments.',
+    requestedBy: 'Sprout_09 🌱',
+    contactInfo: 'sprout09@campus.example'
   },
   {
-    itemName: 'Engineering Drawing Mini Drafter',
+    itemName: 'Engineering Graphics Mini Drafter & Clips',
     category: 'Lab Equipment',
-    maxBudget: 800,
-    description: 'Required for Monday morning workshop lab.',
-    requestedBy: 'Finch_05 🐦',
-    contactInfo: 'finch05@campus.example'
+    maxBudget: 500,
+    description: 'First year student looking for an intact mini drafter for weekly drawing studio sessions.',
+    requestedBy: 'Boba_19 🧋',
+    contactInfo: 'boba19@campus.example'
+  },
+  {
+    itemName: 'Ergonomic Desk Chair or Folding Study Table',
+    category: 'Furniture',
+    maxBudget: 1500,
+    description: 'Looking for a sturdy chair or compact study table for hostel room.',
+    requestedBy: 'Mochi_14 🍡',
+    contactInfo: 'mochi14@campus.example'
   }
 ];
 
@@ -325,25 +414,24 @@ function seedData(db) {
     console.log(`[Seed] Historical transactions already present (${histCountRow.count} rows). Skipping duplicate seed.`);
   }
 
-  // 2. Demo pseudonymous users (idempotent)
-  const userCountRow = db.prepare('SELECT COUNT(*) AS count FROM users').get();
-  if (userCountRow.count === 0) {
-    const insertUser = db.prepare(`
-      INSERT INTO users (handle, avatar_emoji, department, is_demo, is_verified)
-      VALUES (@handle, @avatarEmoji, @department, 1, @isVerified)
-    `);
-    const insertUsers = db.transaction((users) => {
-      for (const u of users) insertUser.run(u);
-    });
-    insertUsers(DEMO_USERS);
-  }
+  // 2. Demo pseudonymous users (idempotent by handle)
+  const upsertDemoUser = db.prepare(`
+    INSERT OR IGNORE INTO users (handle, avatar_emoji, department, is_demo, is_verified)
+    VALUES (@handle, @avatarEmoji, @department, 1, @isVerified)
+  `);
+  const insertUsers = db.transaction((users) => {
+    for (const u of users) upsertDemoUser.run(u);
+  });
+  insertUsers(DEMO_USERS);
 
   const userRows = db.prepare('SELECT id, handle, avatar_emoji FROM users').all();
   const userMap = new Map(userRows.map((u) => [u.handle, u]));
   const fallbackUser = userRows[0];
 
-  // 3. Listings (seed initial set if empty, OR upgrade legacy rows with seller_id & add sample SWAP/BORROW/RENT if none exist)
-  const listingsCountRow = db.prepare('SELECT COUNT(*) AS count FROM listings').get();
+  // 3. Seed unified dummy listings without duplicating existing items
+  const existingRows = db.prepare('SELECT id, item_name AS itemName, image_url AS imageUrl FROM listings').all();
+  const existingByName = new Map(existingRows.map((r) => [String(r.itemName).toLowerCase(), r]));
+
   const insertListing = db.prepare(`
     INSERT INTO listings (
       seller_id, item_name, category, condition_grade, age_in_months, original_price,
@@ -356,102 +444,79 @@ function seedData(db) {
       @suggestedPrice, @sellingPrice, @minAcceptablePrice, @willingToNegotiate,
       @transactionType, 'AVAILABLE', @swapFor, @allowMultipleSwaps,
       @rentalPricePerDay, @minDurationDays, @maxDurationDays, @refundableDeposit,
-      @collectionLocation, @specialConditions, @description, @sellerName, @contactInfo, ''
+      @collectionLocation, @specialConditions, @description, @sellerName, @contactInfo, @imageUrl
     )
   `);
+  const updateImageStmt = db.prepare('UPDATE listings SET image_url = ? WHERE id = ? AND (image_url IS NULL OR image_url = \'\')');
 
-  if (listingsCountRow.count === 0) {
-    const insertMany = db.transaction((items) => {
-      for (const item of items) {
-        const u = userMap.get(item.handle) || fallbackUser;
-        insertListing.run({
-          sellerId: u.id,
-          itemName: item.itemName,
-          category: item.category,
-          condition: item.condition,
-          ageInMonths: item.ageInMonths,
-          originalPrice: item.originalPrice,
-          suggestedPrice: item.suggestedPrice ?? null,
-          sellingPrice: item.sellingPrice ?? 0,
-          minAcceptablePrice: item.minAcceptablePrice ?? null,
-          willingToNegotiate: item.willingToNegotiate ?? 1,
-          transactionType: item.transactionType,
-          swapFor: item.swapFor || '',
-          allowMultipleSwaps: item.allowMultipleSwaps ?? 1,
-          rentalPricePerDay: item.rentalPricePerDay ?? null,
-          minDurationDays: item.minDurationDays ?? null,
-          maxDurationDays: item.maxDurationDays ?? null,
-          refundableDeposit: item.refundableDeposit ?? 0,
-          collectionLocation: item.collectionLocation || '',
-          specialConditions: item.specialConditions || '',
-          description: item.description || '',
-          sellerName: `${u.handle} ${u.avatar_emoji}`,
-          contactInfo: `${u.handle.toLowerCase()}@campus.example`
-        });
-      }
-    });
-    insertMany(DEFAULT_LISTINGS);
-    console.log(`[Seed] Populated ${DEFAULT_LISTINGS.length} initial unified listings.`);
-  } else {
-    // Safe backward compatibility: ensure existing legacy rows have seller_id & transaction_type
-    if (fallbackUser) {
-      db.prepare(
-        `UPDATE listings SET seller_id = ?, seller_name = COALESCE(NULLIF(seller_name, ''), ?) WHERE seller_id IS NULL`
-      ).run(fallbackUser.id, `${fallbackUser.handle} ${fallbackUser.avatar_emoji}`);
-    }
-    // Add one sample SWAP/BORROW/RENT if only SELL listings existed before Phase 1 migration
-    const nonSellCount = db.prepare("SELECT COUNT(*) AS c FROM listings WHERE transaction_type != 'SELL'").get().c;
-    if (nonSellCount === 0) {
-      const extraTypes = DEFAULT_LISTINGS.filter((d) => d.transactionType !== 'SELL');
-      const insertExtras = db.transaction((items) => {
-        for (const item of items) {
-          const u = userMap.get(item.handle) || fallbackUser;
-          insertListing.run({
-            sellerId: u.id,
-            itemName: item.itemName,
-            category: item.category,
-            condition: item.condition,
-            ageInMonths: item.ageInMonths,
-            originalPrice: item.originalPrice,
-            suggestedPrice: item.suggestedPrice ?? null,
-            sellingPrice: item.sellingPrice ?? 0,
-            minAcceptablePrice: null,
-            willingToNegotiate: 0,
-            transactionType: item.transactionType,
-            swapFor: item.swapFor || '',
-            allowMultipleSwaps: item.allowMultipleSwaps ?? 1,
-            rentalPricePerDay: item.rentalPricePerDay ?? null,
-            minDurationDays: item.minDurationDays ?? null,
-            maxDurationDays: item.maxDurationDays ?? null,
-            refundableDeposit: item.refundableDeposit ?? 0,
-            collectionLocation: item.collectionLocation || '',
-            specialConditions: item.specialConditions || '',
-            description: item.description || '',
-            sellerName: `${u.handle} ${u.avatar_emoji}`,
-            contactInfo: `${u.handle.toLowerCase()}@campus.example`
-          });
+  if (fallbackUser) {
+    db.prepare(
+      `UPDATE listings SET seller_id = ?, seller_name = COALESCE(NULLIF(seller_name, ''), ?) WHERE seller_id IS NULL`
+    ).run(fallbackUser.id, `${fallbackUser.handle} ${fallbackUser.avatar_emoji}`);
+  }
+
+  let addedListings = 0;
+  const seedListingsTx = db.transaction((items) => {
+    for (const item of items) {
+      const existing = existingByName.get(item.itemName.toLowerCase());
+      if (existing) {
+        if (!existing.imageUrl && item.imageUrl) {
+          updateImageStmt.run(item.imageUrl, existing.id);
         }
+        continue;
+      }
+      const u = userMap.get(item.handle) || fallbackUser;
+      insertListing.run({
+        sellerId: u.id,
+        itemName: item.itemName,
+        category: item.category,
+        condition: item.condition,
+        ageInMonths: item.ageInMonths,
+        originalPrice: item.originalPrice,
+        suggestedPrice: item.suggestedPrice ?? null,
+        sellingPrice: item.sellingPrice ?? 0,
+        minAcceptablePrice: item.minAcceptablePrice ?? null,
+        willingToNegotiate: item.willingToNegotiate ?? 1,
+        transactionType: item.transactionType,
+        swapFor: item.swapFor || '',
+        allowMultipleSwaps: item.allowMultipleSwaps ?? 1,
+        rentalPricePerDay: item.rentalPricePerDay ?? null,
+        minDurationDays: item.minDurationDays ?? null,
+        maxDurationDays: item.maxDurationDays ?? null,
+        refundableDeposit: item.refundableDeposit ?? 0,
+        collectionLocation: item.collectionLocation || '',
+        specialConditions: item.specialConditions || '',
+        description: item.description || '',
+        sellerName: `${u.handle} ${u.avatar_emoji}`,
+        contactInfo: `${u.handle.toLowerCase()}@campus.example`,
+        imageUrl: item.imageUrl || ''
       });
-      insertExtras(extraTypes);
-      console.log('[Seed] Added sample SWAP, BORROW, and RENT listings for Phase 1.');
+      addedListings += 1;
     }
+  });
+  seedListingsTx(DEFAULT_LISTINGS);
+  if (addedListings > 0) {
+    console.log(`[Seed] Added ${addedListings} showcase unified listings.`);
   }
 
-  // 4. Wanted requests (idempotent)
-  const wantedCountRow = db.prepare('SELECT COUNT(*) AS count FROM wanted_requests').get();
-  if (wantedCountRow.count === 0) {
-    const insertWanted = db.prepare(`
-      INSERT INTO wanted_requests
-        (item_name, category, max_budget, description, requested_by, contact_info)
-      VALUES
-        (@itemName, @category, @maxBudget, @description, @requestedBy, @contactInfo)
-    `);
-    const insertMany = db.transaction((items) => {
-      for (const item of items) insertWanted.run(item);
-    });
-    insertMany(DEFAULT_WANTED);
-    console.log(`[Seed] Populated ${DEFAULT_WANTED.length} initial wanted requests.`);
-  }
+  // 4. Wanted requests (idempotent by item_name)
+  const existingWantedNames = new Set(
+    db.prepare('SELECT item_name AS itemName FROM wanted_requests').all().map((w) => String(w.itemName).toLowerCase())
+  );
+  const insertWanted = db.prepare(`
+    INSERT INTO wanted_requests
+      (item_name, category, max_budget, description, requested_by, contact_info)
+    VALUES
+      (@itemName, @category, @maxBudget, @description, @requestedBy, @contactInfo)
+  `);
+  const insertWantedTx = db.transaction((items) => {
+    for (const item of items) {
+      if (!existingWantedNames.has(item.itemName.toLowerCase())) {
+        insertWanted.run(item);
+      }
+    }
+  });
+  insertWantedTx(DEFAULT_WANTED);
 }
 
 if (require.main === module) {

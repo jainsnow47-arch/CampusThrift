@@ -33,7 +33,7 @@ app.get('/api/health', (req, res) => {
     const result = db.prepare('SELECT 1 AS connected').get();
     res.json({
       status: 'UP',
-      platform: 'ReLoop Campus Resale Marketplace',
+      platform: 'Campus Thrift Marketplace',
       database: result && result.connected === 1 ? 'Connected (SQLite)' : 'Unknown',
       timestamp: new Date().toISOString()
     });
@@ -70,7 +70,7 @@ async function startServer() {
 
     const server = app.listen(PORT, '0.0.0.0', () => {
       console.log('=======================================================');
-      console.log('  RELOOP - THE SMART CAMPUS RESALE MARKETPLACE');
+      console.log('  CAMPUS THRIFT - SMART CAMPUS CIRCULAR MARKETPLACE');
       console.log(`  Server running live at: http://localhost:${PORT}`);
       console.log(`  Marketplace UI:        http://localhost:${PORT}`);
       console.log(`  Pricing Engine API:    http://localhost:${PORT}/api/pricing`);

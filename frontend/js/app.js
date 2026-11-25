@@ -1,4 +1,4 @@
-// ReLoop Application Controller
+// Campus Thrift Application Controller
 
 document.addEventListener('DOMContentLoaded', () => {
   App.init();
@@ -12,6 +12,44 @@ const CATEGORY_EMOJI = {
   Furniture: '🪑',
   'Lab Equipment': '🧪',
   Other: '🎒'
+};
+
+const CATEGORY_FALLBACK_SVG = {
+  Calculators:
+    'data:image/svg+xml;utf8,' +
+    encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240"><rect width="400" height="240" fill="#BFE8C9"/><rect x="135" y="28" width="130" height="184" rx="14" fill="#111111"/><rect x="148" y="42" width="104" height="40" rx="6" fill="#FFC93C"/><text x="242" y="70" font-family="monospace" font-size="18" font-weight="bold" fill="#111111" text-anchor="end">sin(x)</text><g fill="#FFFDF8"><rect x="150" y="96" width="20" height="18" rx="4"/><rect x="176" y="96" width="20" height="18" rx="4"/><rect x="202" y="96" width="20" height="18" rx="4"/><rect x="228" y="96" width="20" height="18" rx="4"/><rect x="150" y="122" width="20" height="18" rx="4"/><rect x="176" y="122" width="20" height="18" rx="4"/><rect x="202" y="122" width="20" height="18" rx="4"/><rect x="228" y="122" width="20" height="18" rx="4"/><rect x="150" y="148" width="20" height="18" rx="4"/><rect x="176" y="148" width="20" height="18" rx="4"/><rect x="202" y="148" width="20" height="18" rx="4"/><rect x="228" y="148" width="20" height="44" rx="4" fill="#3CC4B3"/><rect x="150" y="174" width="46" height="18" rx="4"/><rect x="202" y="174" width="20" height="18" rx="4"/></g></svg>`
+    ),
+  Books:
+    'data:image/svg+xml;utf8,' +
+    encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240"><rect width="400" height="240" fill="#FFC93C"/><rect x="92" y="140" width="216" height="36" rx="8" fill="#FFFDF8" stroke="#111111" stroke-width="5"/><rect x="108" y="100" width="184" height="36" rx="8" fill="#3CC4B3" stroke="#111111" stroke-width="5"/><rect x="124" y="60" width="152" height="36" rx="8" fill="#9B7BEA" stroke="#111111" stroke-width="5"/><rect x="145" y="72" width="90" height="10" rx="4" fill="#FFFDF8"/></svg>`
+    ),
+  Cycles:
+    'data:image/svg+xml;utf8,' +
+    encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240"><rect width="400" height="240" fill="#4C9BE8"/><circle cx="120" cy="155" r="44" fill="#FFFDF8" stroke="#111111" stroke-width="8"/><circle cx="280" cy="155" r="44" fill="#FFFDF8" stroke="#111111" stroke-width="8"/><path d="M120 155 L185 155 L230 95 L155 95 Z M230 95 L280 155 M175 75 L200 75 M222 72 L248 72" fill="none" stroke="#FFC93C" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+    ),
+  Electronics:
+    'data:image/svg+xml;utf8,' +
+    encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240"><rect width="400" height="240" fill="#9B7BEA"/><rect x="105" y="48" width="190" height="122" rx="12" fill="#111111"/><rect x="118" y="61" width="164" height="96" rx="6" fill="#3CC4B3"/><path d="M85 178 L315 178 L330 196 L70 196 Z" fill="#FFC93C" stroke="#111111" stroke-width="5"/></svg>`
+    ),
+  Furniture:
+    'data:image/svg+xml;utf8,' +
+    encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240"><rect width="400" height="240" fill="#F9C9B0"/><rect x="90" y="95" width="220" height="22" rx="6" fill="#111111"/><rect x="110" y="117" width="18" height="78" rx="4" fill="#111111"/><rect x="272" y="117" width="18" height="78" rx="4" fill="#111111"/><rect x="145" y="55" width="110" height="40" rx="8" fill="#FFC93C" stroke="#111111" stroke-width="5"/></svg>`
+    ),
+  'Lab Equipment':
+    'data:image/svg+xml;utf8,' +
+    encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240"><rect width="400" height="240" fill="#F7A8C4"/><path d="M175 45 L225 45 M185 45 L185 95 L140 178 C134 188 142 198 154 198 L246 198 C258 198 266 188 260 178 L215 95 L215 45" fill="#FFFDF8" stroke="#111111" stroke-width="8" stroke-linejoin="round"/><path d="M158 148 L242 148 L254 178 C256 183 252 188 246 188 L154 188 C148 188 144 183 146 178 Z" fill="#3CC4B3"/></svg>`
+    ),
+  Other:
+    'data:image/svg+xml;utf8,' +
+    encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240"><rect width="400" height="240" fill="#3CC4B3"/><rect x="125" y="62" width="150" height="122" rx="14" fill="#FFC93C" stroke="#111111" stroke-width="6"/><path d="M125 104 L275 104 M200 62 L200 184" stroke="#111111" stroke-width="6"/></svg>`
+    )
 };
 
 const AVATAR_BG = ['#FFC93C', '#BFE8C9', '#F7A8C4', '#9B7BEA', '#4C9BE8', '#3CC4B3', '#F9C9B0'];
@@ -295,51 +333,116 @@ const App = {
     return copy;
   },
 
-  renderPriceSummaryHtml(item) {
-    const type = item.transactionType || 'SELL';
+  getFallbackImage(category) {
+    return CATEGORY_FALLBACK_SVG[category] || CATEGORY_FALLBACK_SVG.Other;
+  },
+
+  getDeptAgeTag(item) {
+    const rawDept = item.sellerProfile?.department || 'ALL';
+    const token = rawDept.split(/[\s•,]+/).find(Boolean) || 'ALL';
+    const deptCode = token.length <= 7 ? token.toUpperCase() : token.slice(0, 4).toUpperCase();
+    const months = Number(item.ageInMonths || 0);
+    let ageStr = `${months}M`;
+    if (months >= 12) {
+      const years = Number((months / 12).toFixed(1));
+      ageStr = `${years % 1 === 0 ? Math.round(years) : years}Y`;
+    }
+    return `${deptCode} · ${ageStr}`;
+  },
+
+  getCardModeLabel(item) {
+    const type = (item.transactionType || 'SELL').toUpperCase();
+    const cat = String(item.category || 'CAMPUS').toUpperCase();
+    const prefixMap = {
+      BORROW: 'FREE BORROW',
+      SELL: 'FOR SALE',
+      SWAP: 'OPEN SWAP',
+      RENT: 'DAILY RENT'
+    };
+    return `${prefixMap[type] || type} · ${cat === 'LAB EQUIPMENT' ? 'LAB GEAR' : cat}`;
+  },
+
+  getConditionBadgeHtml(condition) {
+    const condClass = condition ? condition.replace(/\s+/g, '') : 'Good';
+    const iconMap = {
+      'Like New': '✨',
+      Excellent: '🌟',
+      Good: '💛',
+      Fair: '🛠️',
+      Poor: '📦'
+    };
+    const labelMap = {
+      Good: 'Well Loved'
+    };
+    const icon = iconMap[condition] || '✨';
+    const label = labelMap[condition] || condition || 'Good';
+    return `<span class="badge-condition-bottom ${condClass}">${icon} ${this.escapeHtml(label)}</span>`;
+  },
+
+  getLocationRowHtml(item) {
+    const type = (item.transactionType || 'SELL').toUpperCase();
+    if (type === 'BORROW') {
+      const days = item.minDurationDays && item.maxDurationDays ? `${item.minDurationDays}–${item.maxDurationDays}d` : 'Flexible';
+      const spot = item.collectionLocation || 'Campus Library';
+      return `
+        <div class="listing-loc-row">
+          <i data-lucide="map-pin" style="width:13px;height:13px;flex-shrink:0;"></i>
+          <span>${this.escapeHtml(days)} · ${this.escapeHtml(spot)}</span>
+        </div>
+      `;
+    }
+    if (type === 'RENT') {
+      const days = item.minDurationDays && item.maxDurationDays ? `${item.minDurationDays}–${item.maxDurationDays}d` : 'Daily';
+      const spot = item.collectionLocation || 'Campus Quad';
+      return `
+        <div class="listing-loc-row">
+          <i data-lucide="clock" style="width:13px;height:13px;flex-shrink:0;"></i>
+          <span>${this.escapeHtml(days)} · ${this.escapeHtml(spot)}</span>
+        </div>
+      `;
+    }
+    if (type === 'SWAP') {
+      return `
+        <div class="listing-loc-row is-swap">
+          <i data-lucide="repeat" style="width:13px;height:13px;flex-shrink:0;"></i>
+          <span>Wants: ${this.escapeHtml((item.swapFor || 'Campus gear').slice(0, 40))}</span>
+        </div>
+      `;
+    }
+    const spot = item.collectionLocation || (item.willingToNegotiate ? 'Open to fair offers' : 'Fixed asking price');
+    return `
+      <div class="listing-loc-row ${item.willingToNegotiate ? '' : 'is-urgent'}">
+        <i data-lucide="map-pin" style="width:13px;height:13px;flex-shrink:0;"></i>
+        <span>${this.escapeHtml(spot)}${item.willingToNegotiate ? ' · Negotiable' : ' · Fixed Price'}</span>
+      </div>
+    `;
+  },
+
+  renderCardFooterPriceHtml(item) {
+    const type = (item.transactionType || 'SELL').toUpperCase();
     const orig = parseFloat(item.originalPrice || 0);
     const sell = parseFloat(item.sellingPrice || 0);
 
-    if (type === 'SWAP') {
-      return `
-        <div>
-          <span class="price-main" style="font-size:1.08rem;">OPEN TO SWAP</span>
-          <div style="font-size:0.74rem; color:var(--ink-muted); font-weight:600;">Wants: ${this.escapeHtml((item.swapFor || 'Campus items').slice(0, 34))}</div>
-        </div>
-        <span class="discount-tag bg-purple" style="color:#FFFFFF;">Trade</span>
-      `;
-    }
-
     if (type === 'BORROW') {
-      const maxD = item.maxDurationDays ? `Up to ${item.maxDurationDays}d` : 'Flexible';
-      return `
-        <div>
-          <span class="price-main" style="font-size:1.15rem;">FREE BORROW</span>
-          <div style="font-size:0.74rem; color:var(--ink-muted); font-weight:600;">${this.escapeHtml(maxD)}${item.refundableDeposit > 0 ? ` · ₹${item.refundableDeposit} dep` : ''}</div>
-        </div>
-        <span class="discount-tag bg-teal">₹0</span>
-      `;
+      return `<div class="listing-price-inline"><span class="price-main">FREE LEND</span></div>`;
     }
-
+    if (type === 'SWAP') {
+      return `<div class="listing-price-inline"><span class="price-main">OPEN SWAP</span></div>`;
+    }
     if (type === 'RENT') {
       const rate = parseFloat(item.rentalPricePerDay || item.sellingPrice || 0);
-      const daysText = item.minDurationDays && item.maxDurationDays ? `${item.minDurationDays}-${item.maxDurationDays}d` : 'Daily';
       return `
-        <div>
-          <span class="price-main">₹${rate.toLocaleString('en-IN')}<span style="font-size:0.82rem; font-weight:700;">/day</span></span>
-          <div style="font-size:0.74rem; color:var(--ink-muted); font-weight:600;">Term: ${this.escapeHtml(daysText)}</div>
+        <div class="listing-price-inline">
+          <span class="price-main">₹${rate.toLocaleString('en-IN')}<span style="font-size:0.75rem;">/day</span></span>
         </div>
-        <span class="discount-tag bg-peach">Rent</span>
       `;
     }
-
     const discount = orig > sell ? Math.round(((orig - sell) / orig) * 100) : 0;
     return `
-      <div>
+      <div class="listing-price-inline">
         <span class="price-main">₹${sell.toLocaleString('en-IN')}</span>
-        ${orig > sell ? `<span class="price-original">₹${orig.toLocaleString('en-IN')}</span>` : ''}
+        ${discount > 0 ? `<span class="listing-discount-inline">-${discount}%</span>` : ''}
       </div>
-      ${discount > 0 ? `<span class="discount-tag">-${discount}%</span>` : ''}
     `;
   },
 
@@ -361,48 +464,71 @@ const App = {
 
     grid.innerHTML = listings
       .map((item) => {
-        const type = item.transactionType || 'SELL';
-        const condClass = item.condition ? item.condition.replace(/\s+/g, '') : 'Good';
+        const type = (item.transactionType || 'SELL').toUpperCase();
         const mascot = item.littleLoop || { emoji: '✨', message: 'Ready for a new campus owner!' };
+        const seller = item.sellerProfile || {
+          handle: (item.sellerName || 'Panda_27').split(' ')[0],
+          avatarEmoji: '🐼',
+          department: 'ALL',
+          isVerified: false
+        };
         const isOwner = this.currentUser && item.sellerId && Number(item.sellerId) === Number(this.currentUser.id);
+        const fallbackImg = this.getFallbackImage(item.category);
 
         return `
-          <article class="listing-card" data-id="${item.id}">
-            <div class="listing-thumb-container" style="cursor:pointer;" onclick="App.openListingDetail(${item.id})">
-              <img src="${this.escapeHtml(item.imageUrl)}" alt="${this.escapeHtml(item.itemName)}" class="listing-thumb" loading="lazy">
-              <span class="badge-type badge-type-${this.escapeHtml(type)}">${this.escapeHtml(type)}</span>
-              <span class="badge-condition ${condClass}">${this.escapeHtml(item.condition)}</span>
+          <article class="listing-card card-interactive" data-id="${item.id}">
+            <div class="listing-card-top type-${this.escapeHtml(type)}" onclick="App.openListingDetail(${item.id})">
+              <span class="listing-top-mode">${this.escapeHtml(this.getCardModeLabel(item))}</span>
+              <span class="listing-dept-tag">${this.escapeHtml(this.getDeptAgeTag(item))}</span>
             </div>
+
+            <div class="listing-thumb-container" style="cursor:pointer;" onclick="App.openListingDetail(${item.id})">
+              <img
+                src="${this.escapeHtml(item.imageUrl || fallbackImg)}"
+                alt="${this.escapeHtml(item.itemName)}"
+                class="listing-thumb"
+                loading="lazy"
+                onerror="this.onerror=null;this.src='${fallbackImg}';"
+              >
+              ${this.getConditionBadgeHtml(item.condition)}
+            </div>
+
             <div class="listing-body">
-              <div class="listing-cat-line">${this.escapeHtml(item.category)} · ${item.ageInMonths} mos old</div>
-              <h3 class="listing-title" style="cursor:pointer;" onclick="App.openListingDetail(${item.id})" title="${this.escapeHtml(item.itemName)}">${this.escapeHtml(item.itemName)}</h3>
-              <div class="listing-meta-row">
-                By ${this.escapeHtml(item.sellerName || 'Panda_27 🐼')} · ${this.escapeHtml(item.availabilityStatus || 'AVAILABLE')}
-              </div>
+              <h3 class="listing-title" style="cursor:pointer;" onclick="App.openListingDetail(${item.id})" title="${this.escapeHtml(item.itemName)}">
+                ${this.escapeHtml(item.itemName)}
+              </h3>
 
               <div class="little-loop-mini">
                 <span style="font-size:1.05rem; flex-shrink:0;">${this.escapeHtml(mascot.emoji)}</span>
                 <span>“${this.escapeHtml(mascot.message)}”</span>
               </div>
 
-              <div class="listing-price-box">
-                ${this.renderPriceSummaryHtml(item)}
-              </div>
+              ${this.getLocationRowHtml(item)}
 
-              <div class="listing-footer-actions">
-                <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="App.openListingDetail(${item.id})">
-                  View Details
-                </button>
-                <button class="btn btn-yellow btn-sm" onclick="App.openContactToast(${item.id})">
-                  Handle
-                </button>
-                ${
-                  isOwner
-                    ? `<button class="btn btn-secondary btn-sm btn-icon" title="Remove My Listing" aria-label="Remove My Listing" onclick="App.confirmDeleteListing(${item.id})">
-                         <i data-lucide="trash-2" style="width:15px;height:15px;color:#F25F5C;"></i>
-                       </button>`
-                    : ''
-                }
+              <div class="listing-bottom-bar">
+                ${this.renderCardFooterPriceHtml(item)}
+
+                <div class="listing-seller-cluster">
+                  <button type="button" class="seller-handle-btn" title="Copy handle ${this.escapeHtml(seller.handle)}" onclick="App.openContactToast(${item.id})">
+                    <span>${this.escapeHtml(seller.avatarEmoji || '🐼')}</span>
+                    <span>${this.escapeHtml(seller.handle)}</span>
+                  </button>
+                  ${
+                    seller.isVerified
+                      ? `<span class="verified-pill"><i data-lucide="check-circle" style="width:11px;height:11px;"></i> Verified</span>`
+                      : ''
+                  }
+                  ${
+                    isOwner
+                      ? `<button type="button" class="card-arrow-btn" title="Remove My Listing" aria-label="Remove My Listing" onclick="App.confirmDeleteListing(${item.id})">
+                           <i data-lucide="trash-2" style="width:14px;height:14px;color:#F25F5C;"></i>
+                         </button>`
+                      : ''
+                  }
+                  <button type="button" class="card-arrow-btn" title="View Listing Details" aria-label="View Listing Details" onclick="App.openListingDetail(${item.id})">
+                    <i data-lucide="arrow-right" style="width:15px;height:15px;"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </article>
@@ -612,7 +738,7 @@ const App = {
               <span class="tag">${this.escapeHtml(item.category)}</span>
             </div>
             <div class="numbered-section-body">
-              <img src="${this.escapeHtml(item.imageUrl)}" alt="${this.escapeHtml(item.itemName)}" style="width:100%; height:210px; object-fit:cover; border-radius:10px; border:2.5px solid #111111; margin-bottom:14px;">
+              <img src="${this.escapeHtml(item.imageUrl || this.getFallbackImage(item.category))}" alt="${this.escapeHtml(item.itemName)}" onerror="this.onerror=null;this.src='${this.getFallbackImage(item.category)}';" style="width:100%; height:210px; object-fit:cover; border-radius:10px; border:2.5px solid #111111; margin-bottom:14px;">
               <p style="font-size:0.92rem; line-height:1.55; margin-bottom:12px;">${this.escapeHtml(item.description || 'Well-kept campus essential ready for its next semester.')}</p>
               <div style="display:flex; gap:8px; flex-wrap:wrap; font-family:var(--font-mono); font-size:0.75rem;">
                 <span class="tag">Original: ₹${Number(item.originalPrice).toLocaleString('en-IN')}</span>

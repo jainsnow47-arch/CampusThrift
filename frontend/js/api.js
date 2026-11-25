@@ -1,4 +1,4 @@
-// ReLoop Frontend API Client
+// Campus Thrift Frontend API Client
 // Connects to Express REST Backend with Server-Issued Demo Session Token
 
 const API_BASE_URL =

@@ -1,8 +1,8 @@
-# ReLoop – Your Campus, Your Needs, Your Way
+# Campus Thrift – Your Campus, Your Needs, Your Way
 
 > **"Don't buy new. Your campus already has it."**
 
-ReLoop is a campus-specific circular marketplace engineered for college students. It connects students to buy, sell, swap, borrow, and rent campus essentials with pseudonymous student profiles, deterministic **Little Loops** item personalities, and an explainable, data-driven fair pricing engine backed by 200 historical campus transactions in SQLite.
+Campus Thrift is a campus-specific circular marketplace engineered for college students. It connects students to buy, sell, swap, borrow, and rent campus essentials with pseudonymous student profiles, deterministic **Little Loops** item personalities, and an explainable, data-driven fair pricing engine backed by 200 historical campus transactions in SQLite.
 
 ---
 
@@ -36,13 +36,13 @@ ReLoop is a campus-specific circular marketplace engineered for college students
    - **SWAP**: Desired exchange items/categories (`swapFor`) and `allowMultipleSwaps`.
    - **BORROW**: Free lending (`₹0`), min/max borrowing days, collection location, optional refundable deposit, and special conditions.
    - **RENT**: Daily rate (`rentalPricePerDay`), min/max rental days, optional deposit, collection location, and rental conditions.
-3. **Pseudonymous Campus Identity & Emoji Avatars**: Synthetic demo personas (`Panda_27 🐼`, `Mochi_14 🍡`, `Pixel_Fox 🦊`, etc.), random persona generation, customizable handle/emoji profile modal, and server-side ownership enforcement on listing deletion.
+3. **Pseudonymous Campus Identity & Emoji Avatars**: 11 synthetic demo personas (`Panda_27 🐼`, `Mochi_14 🍡`, `Pixel_Fox 🦊`, `Koala_88 🐨`, `Sprout_09 🌱`, `Otter_42 🦦`, `Boba_19 🧋`, `Lynx_64 🐱`, `BinaryBard 🧭`, `SolderPro 🧩`, `PixelPanda 🦊`), random persona generation, customizable handle/emoji profile modal, and server-side ownership enforcement on listing deletion.
 4. **Little Loops Item Personalities**: Deterministic, template-based first-person item buddy messages (`backend/services/mascotService.js`) tailored to category, age, condition, and transaction type—no external LLM API required.
 5. **Preserved Explainable Fair Pricing Engine & Insights**:
    - Weighted similarity formula across condition proximity and exponential age decay using the 200 historical transactions.
    - Live Chart.js insights dashboard (`/api/pricing/insights`).
 6. **Neo-Brutalist UI Redesign**:
-   - Top segmented navigation, identity chip with `Demo` badge, scrolling ink ticker strip, category & mode filters, 4 comic-cover transaction mode cards, Neo-Brutalist toggle switches, and a 4-panel Listing Detail view.
+   - Top segmented navigation, identity chip with `Demo` badge, scrolling ink ticker strip, category & mode filters, showcase listing cards with colored mode headers, condition pills, verified tags, 4 comic-cover transaction mode cards, Neo-Brutalist toggle switches, and a 4-panel Listing Detail view.
 
 ---
 
@@ -58,9 +58,9 @@ npm install
 npm start
 ```
 
-On startup, ReLoop automatically:
+On startup, Campus Thrift automatically:
 1. Initializes `backend/database/reloop.sqlite` and applies schema + safe column migrations.
-2. Seeds **200 historical transactions**, **6 synthetic demo users**, sample `SELL`/`SWAP`/`BORROW`/`RENT` listings, and initial wanted requests without duplicating records on restart.
+2. Seeds **200 historical transactions**, **11 synthetic demo users**, **10 showcase `SELL`/`SWAP`/`BORROW`/`RENT` listings**, and **4 initial wanted requests** without duplicating records on restart.
 3. Starts the Express server and serves the frontend on **`http://localhost:3000`** (or `PORT` env variable).
 
 ---
